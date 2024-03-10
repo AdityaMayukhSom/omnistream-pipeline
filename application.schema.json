@@ -1,0 +1,64 @@
+{
+    "$id": "https://blogs.devstream.in/application.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Blogs Deployment Descriptor",
+    "description": "File to describe the deployment configurations for blog website.",
+    "type": "object",
+    "properties": {
+        "app": {
+            "type": "object",
+            "properties": {
+                "port": {
+                    "type": "integer"
+                },
+                "access_secret_key": {
+                    "type": "string"
+                },
+                "refresh_secret_key": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "access_secret_key",
+                "refresh_secret_key"
+            ]
+        },
+        "database": {
+            "type": "object",
+            "properties": {
+                "vendor": {
+                    "enum": [
+                        "mongodb",
+                        "mysql",
+                        "postgres",
+                        "mariadb"
+                    ]
+                },
+                "url": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "database_name": {
+                    "type": "string",
+                    "description": "Name of the database in which details of the blogs will be stored."
+                }
+            },
+            "required": [
+                "url",
+                "username",
+                "password",
+                "database_name"
+            ]
+        }
+    },
+    "required": [
+        "app",
+        "database"
+    ],
+    "additionalProperties": false
+}
