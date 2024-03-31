@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"devstream.in/blogs/models"
 	"devstream.in/blogs/repositories"
@@ -12,49 +11,17 @@ import (
 )
 
 func LogIn(w http.ResponseWriter, r *http.Request) {
-	var receivedUser, existingUser models.User
-
+	var receivedUser models.User
 	json.NewDecoder(r.Body).Decode(&receivedUser)
 
-	results, err := repositories.Db.Query(
-		"SELECT id, name, email, username, password FROM users WHERE email = $1;",
-		receivedUser.Email,
-	)
+	existingUser, err := repositories.RetrieveUserByEmail(receivedUser.Email)
 
 	if err != nil {
+
 		log.Error("could not retrieve user details for given email", "email", receivedUser.Email)
 		w.WriteHeader(http.StatusInternalServerError)
 		enc, _ := json.Marshal(map[string]interface{}{
-			"message": "could not login successfully, try again",
-		})
-		w.Write(enc)
-		return
-	}
-
-	defer results.Close()
-
-	if results.Next() {
-		err = results.Scan(
-			&existingUser.Id,
-			&existingUser.Name,
-			&existingUser.Email,
-			&existingUser.Username,
-			&existingUser.Password,
-		)
-
-		if err != nil {
-			log.Error("could not parse user details for given email", "email", receivedUser.Email)
-			w.WriteHeader(http.StatusInternalServerError)
-			enc, _ := json.Marshal(map[string]interface{}{
-				"message": "could not login successfully, try again",
-			})
-			w.Write(enc)
-			return
-		}
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-		enc, _ := json.Marshal(map[string]interface{}{
-			"message": "there exists no user for given email",
+			"message": err.Error(),
 		})
 		w.Write(enc)
 		return
@@ -73,12 +40,11 @@ func LogIn(w http.ResponseWriter, r *http.Request) {
 		w.Write(enc)
 	}
 
-	idInt, _ := strconv.Atoi(existingUser.Id)
 	name := existingUser.Name
 	email := existingUser.Email
 	username := existingUser.Username
 
-	tokenStruct, err := generateToken(idInt, name, email, username)
+	tokenStruct, err := generateToken(name, email, username)
 
 	if err != nil {
 		log.Error("could not generate acces token for given email", "email", receivedUser.Email)

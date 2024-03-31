@@ -56,7 +56,7 @@ func ExtractToken(r *http.Request) string {
 	return tokenStr
 }
 
-func generateToken(id, name, email, username interface{}) (*models.Token, error) {
+func generateToken(name, email, username interface{}) (*models.Token, error) {
 	var err error
 
 	accessSecretKey := config.DefaultConfig.AccessSecretKey
@@ -71,7 +71,6 @@ func generateToken(id, name, email, username interface{}) (*models.Token, error)
 	accessTokenClaims := jwt.MapClaims{}
 	accessTokenClaims["authorized"] = true
 	accessTokenClaims["access_uuid"] = tokenInfo.AccessUuid
-	accessTokenClaims["user_id"] = id
 	accessTokenClaims["user_name"] = name
 	accessTokenClaims["user_email"] = email
 	accessTokenClaims["user_username"] = username
@@ -84,8 +83,7 @@ func generateToken(id, name, email, username interface{}) (*models.Token, error)
 
 	refreshTokenClaims := jwt.MapClaims{}
 	refreshTokenClaims["refresh_uuid"] = uuid.NewString()
-	refreshTokenClaims["user_id"] = id
-	refreshTokenClaims["user_name"] = username
+	refreshTokenClaims["user_username"] = username
 	refreshTokenClaims["exp"] = time.Now().Add(time.Hour * 24 * 7).Unix()
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
 	tokenInfo.RefreshToken, err = refreshToken.SignedString([]byte(refreshSecretKey))
