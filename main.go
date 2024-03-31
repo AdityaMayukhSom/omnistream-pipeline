@@ -1,13 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/charmbracelet/log"
 	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
 
 	"devstream.in/blogs/auth"
 	"devstream.in/blogs/config"
@@ -22,12 +20,7 @@ func main() {
 		log.Fatal("could not load config", "err", err)
 	}
 	log.Info(conf.DatabaseConf.Source)
-	repositories.Db, err = sql.Open("postgres", conf.DatabaseConf.Source)
-	if err != nil {
-		log.Fatal("Failed to connect to database.")
-	}
-
-	defer repositories.Db.Close()
+	repositories.SetupDatabase()
 
 	r := mux.NewRouter()
 	r.Use(middlewares.WithCorsMiddleware)
@@ -58,4 +51,6 @@ func main() {
 	if err != nil {
 		log.Fatal("could not start http server", "err", err)
 	}
+
+	repositories.CleanupDatabase()
 }
