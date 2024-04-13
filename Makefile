@@ -1,6 +1,6 @@
 FLAGS = -race
 PACKAGE_NAME = api
-INPUT_DIR = ./$(PACKAGE_NAME)/main.go
+INPUT_DIR = main.go
 OUTPUT_DIR = ./build/
 
 .PHONY: build
