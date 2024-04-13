@@ -8,6 +8,7 @@ import (
 // typically used per entity which
 type Database interface {
 	repository.UserRepository
+	repository.PostRepository
 
 	SetupDatabase()
 	CleanupDatabase()

@@ -5,11 +5,12 @@ import (
 )
 
 type UserRepository interface {
-	FindByUsername(username string)
-	FindByEmail(email string)
+	FindUserByUsername(username string)
+	FindUserByEmail(email string)
 
-	DeleteByUsername(username string)
-	DeleteByEmail(email string)
+	DeleteUserByUsername(username string)
+	DeleteUserByEmail(email string)
 
-	Save(user models.User)
+	CreateUser(user models.User)
+	UpdateUser(user models.User)
 }

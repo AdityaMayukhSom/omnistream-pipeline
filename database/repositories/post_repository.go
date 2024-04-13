@@ -3,11 +3,11 @@ package repository
 import "devstream.in/pixelated-pipeline/services/models"
 
 type PostRepository interface {
-	FindByUsername(username string)
-	FindByEmail(email string)
+	FindPostById(id string)
+	FindPostsByUsername(username string)
 
-	DeleteByUsername(username string)
-	DeleteByEmail(email string)
+	DeletePostById(id string)
 
-	Save(post models.Post)
+	CreatePost(post models.Post)
+	UpdatePost(post models.Post)
 }
