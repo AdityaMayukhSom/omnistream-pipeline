@@ -1,7 +1,7 @@
 package database
 
 import (
-	"devstream.in/pixelated-pipeline/database/mysql"
+	postgresql "devstream.in/pixelated-pipeline/database/postgres"
 	repository "devstream.in/pixelated-pipeline/database/repositories"
 )
 
@@ -16,5 +16,5 @@ type Database interface {
 }
 
 func NewDatabase() Database {
-	return mysql.MysqlDatabase{}
+	return &postgresql.PostgresDatabase{}
 }
