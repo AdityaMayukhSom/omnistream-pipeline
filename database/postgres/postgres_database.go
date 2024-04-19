@@ -1,13 +1,9 @@
-package database
+package postgresql
 
 type PostgresDatabase struct {
 }
 
-func NewPostgresDatabase() *PostgresDatabase {
-	return &PostgresDatabase{}
-}
-
-func (pgdb *PostgresDatabase) SetupDatabase() {
+func (psql *PostgresDatabase) SetupDatabase() {
 	// Db, err := sql.Open("pgx", config.DefaultConfig.DatabaseConf.Source)
 	// if err != nil {
 	// 	log.Fatal("Failed to connect to database.")
@@ -20,7 +16,7 @@ func (pgdb *PostgresDatabase) SetupDatabase() {
 	// Database = gormDB
 }
 
-func CleanupDatabase() {
+func (psql *PostgresDatabase) CleanupDatabase() {
 	// Db, err := Database.DB()
 	// if err != nil {
 	// 	// do something useful

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"devstream.in/pixelated-pipeline/database/mysql"
 	repository "devstream.in/pixelated-pipeline/database/repositories"
 )
 
@@ -12,4 +13,8 @@ type Database interface {
 
 	SetupDatabase()
 	CleanupDatabase()
+}
+
+func NewDatabase() Database {
+	return mysql.MysqlDatabase{}
 }
