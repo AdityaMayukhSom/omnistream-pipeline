@@ -5,4 +5,6 @@ Frontend is written using Svelte Kit (Pixelated Pen).
 
 ## Architecture
 
-![Pixelated Pipeline Architecture](./lld.excalidraw.png)
+![Pixelated Pipeline Architecture][system_design]
+
+[system_design]: ./lld.excalidraw.png
