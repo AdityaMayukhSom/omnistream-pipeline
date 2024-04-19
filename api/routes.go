@@ -17,6 +17,12 @@ type Router interface {
 	Start()
 }
 
+func NewRouter() Router {
+	return &EchoRouter{}
+}
+
+// ------------------------------------------------------------------------
+
 type EchoRouter struct {
 	echo *echo.Echo
 }
