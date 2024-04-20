@@ -11,10 +11,10 @@ type Database interface {
 	repository.UserRepository
 	repository.PostRepository
 
-	SetupDatabase()
-	CleanupDatabase()
+	Migrate()
+	Close()
 }
 
-func NewDatabase() Database {
-	return &postgresql.PostgresDatabase{}
+func Init() Database {
+	return postgresql.NewPostgresDatabase()
 }
