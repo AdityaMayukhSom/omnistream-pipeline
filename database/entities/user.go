@@ -1,10 +1,13 @@
 package entities
 
-type User struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Username string `json:"username" gorm:"primaryKey"`
-	Password string `json:"password"`
+import "time"
 
-	Posts []Post
+type User struct {
+	Name      string `gorm:"not null;size:64"`
+	Email     string `gorm:"uniqueIndex;not null;size:255"`
+	Username  string `gorm:"primaryKey;not null;unique"`
+	Password  string `gorm:"not null;size:32"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Posts     []Post
 }
