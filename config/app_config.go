@@ -1,60 +1,21 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
 )
 
-type DatabaseConfig struct {
-	vendor       string
-	username     string
-	password     string
-	url          string
-	databaseName string
-
-	// Database source with username and password to which
-	// open or connect call has to be done
-	Source string
+type appConfig struct {
+	port             int
+	accessSecretKey  string
+	refreshSecretKey string
+	datasource       string
 }
 
-func (conf *DatabaseConfig) GenerateDatabaseSource() error {
-	if conf.vendor == "" {
-		return fmt.Errorf("database vendor name cannot be empty")
-	}
-
-	switch conf.vendor {
-	case "postgres":
-		connectionString := fmt.Sprintf(
-			"postgresql://%s:%s@%s/%s?sslmode=disable",
-			conf.username,
-			conf.password,
-			conf.url,
-			conf.databaseName,
-		)
-		conf.Source = connectionString
-
-	default:
-		return fmt.Errorf("database vendor %s not supported", conf.vendor)
-	}
-
-	return nil
-}
-
-type AppConfig struct {
-	Port             int
-	AccessSecretKey  string
-	RefreshSecretKey string
-	DatabaseConf     DatabaseConfig
-}
-
-var DefaultConfig = AppConfig{}
+var globalConfig *appConfig
 
 // LoadConfig reads configuration from file or environment variables.
-func LoadConfig() (*AppConfig, error) {
-	config := AppConfig{}
-
+func LoadApplicationConfig() error {
 	viper.AddConfigPath("/etc/secrets")
 	viper.AddConfigPath(".")
 
@@ -73,26 +34,33 @@ func LoadConfig() (*AppConfig, error) {
 			log.Error("application.yml file not found", "message", confErr.Error())
 			log.Info("don't worry, we'll try to populate config with global env variables")
 		} else {
-			return nil, err
+			return err
 		}
 	}
 
-	config.Port = viper.GetInt("app.port")
-	config.AccessSecretKey = viper.GetString("app.access_secret_key")
-	config.RefreshSecretKey = viper.GetString("app.refresh_secret_key")
+	globalConfig.port = viper.GetInt("app.port")
+	globalConfig.accessSecretKey = viper.GetString("app.access_secret_key")
+	globalConfig.refreshSecretKey = viper.GetString("app.refresh_secret_key")
 
-	config.DatabaseConf.vendor = viper.GetString("database.vendor")
-	config.DatabaseConf.username = viper.GetString("database.username")
-	config.DatabaseConf.password = viper.GetString("database.password")
-	config.DatabaseConf.url = viper.GetString("database.url")
-	config.DatabaseConf.databaseName = viper.GetString("database.database_name")
+	if databaseConfig, err := newDatabaseConfig(
+		viper.GetString("database.vendor"),
+		viper.GetString("database.username"),
+		viper.GetString("database.password"),
+		viper.GetString("database.url"),
+		viper.GetString("database.database_name"),
+	); err != nil {
+		datasource, err := databaseConfig.createDataSourceUri()
+		if err != nil {
+			return nil
+		}
 
-	// TODO: validate that every field here is populated
-
-	err := config.DatabaseConf.GenerateDatabaseSource()
-	if err != nil {
-		return nil, err
+		globalConfig.datasource = datasource
 	}
 
-	return &config, nil
+	return nil
 }
+
+func GetPort() int                { return globalConfig.port }
+func GetAccessSecretKey() string  { return globalConfig.accessSecretKey }
+func GetRefreshSecretKey() string { return globalConfig.refreshSecretKey }
+func GetDataSourceUri() string    { return globalConfig.datasource }
