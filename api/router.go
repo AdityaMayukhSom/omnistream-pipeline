@@ -48,6 +48,8 @@ func (er *EchoRouter) RegisterRoutes() {
 		},
 	}))
 
+	er.echo.Static("/", "static")
+
 	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	er.echo.Renderer = NewRenderer("./views/*", true)
