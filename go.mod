@@ -11,6 +11,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.3
+	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.9
 )
 
@@ -70,5 +71,4 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/postgres v1.5.7 // indirect
 )
