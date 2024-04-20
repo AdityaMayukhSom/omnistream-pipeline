@@ -59,8 +59,8 @@ func CheckTokenValidity(r *http.Request, secretKey string) (*jwt.Token, error) {
 func generateToken(name, email, username interface{}) (*models.Token, error) {
 	var err error
 
-	accessSecretKey := config.DefaultConfig.AccessSecretKey
-	refreshSecretKey := config.DefaultConfig.RefreshSecretKey
+	accessSecretKey := config.GetAccessSecretKey()
+	refreshSecretKey := config.GetRefreshSecretKey()
 
 	tokenInfo := &models.Token{}
 	tokenInfo.AccessUuid = uuid.NewString()

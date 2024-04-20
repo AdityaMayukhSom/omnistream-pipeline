@@ -3,17 +3,21 @@ package main
 import (
 	"devstream.in/pixelated-pipeline/api"
 	"devstream.in/pixelated-pipeline/config"
+	"devstream.in/pixelated-pipeline/database"
 	"github.com/charmbracelet/log"
 
 	_ "github.com/swaggo/echo-swagger/example/docs"
 )
 
 func main() {
-	conf, err := config.LoadConfig()
+	err := config.LoadApplicationConfig()
 	if err != nil {
 		log.Fatal("could not load config", "err", err)
 	}
-	log.Info(conf.DatabaseConf.Source)
+
+	db := database.Init()
+	db.Migrate()
+	db.Close()
 
 	router := api.NewRouter()
 	router.RegisterRoutes()
