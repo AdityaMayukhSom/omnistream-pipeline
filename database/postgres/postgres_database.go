@@ -89,5 +89,4 @@ func (psql *PostgresDatabase) Close() {
 	}
 
 	Db.Close()
-
 }
