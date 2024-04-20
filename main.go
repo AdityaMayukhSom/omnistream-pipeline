@@ -15,9 +15,11 @@ func main() {
 		log.Fatal("could not load config", "err", err)
 	}
 
-	db := database.Init()
-	db.Migrate()
-	db.Close()
+	if config.ShallRunMigration() {
+		db := database.Init()
+		db.Migrate()
+		db.Close()
+	}
 
 	router := api.NewRouter()
 	router.RegisterRoutes()
