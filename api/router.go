@@ -51,7 +51,7 @@ func (er *EchoRouter) RegisterRoutes() {
 	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	er.echo.Renderer = NewRenderer("./views/*", true)
-	er.echo.GET("/helloworld", templatesControllers.HelloWorld)
+	er.echo.GET("/hello-world", templatesControllers.HelloWorld)
 
 	apiV1 := er.echo.Group("/api/v1")
 
