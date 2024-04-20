@@ -1,6 +1,6 @@
 services:
   postgresql_database:
-    container_name: 'postgresql_database'
+    container_name: postgresql_database
     image: postgres:16.2-alpine3.19
     restart: always
     ports:
@@ -16,7 +16,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - '6969:8080'
+      - '9000:8080'
 
 volumes:
   postgres_volume:
