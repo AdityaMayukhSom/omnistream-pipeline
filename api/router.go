@@ -40,7 +40,7 @@ func NewEchoRouter() *EchoRouter {
 func (er *EchoRouter) RegisterRoutes() {
 	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 
-	er.echo.Renderer = NewRenderer("./api/views/*.html", true)
+	er.echo.Renderer = NewRenderer("./views/*", true)
 	er.echo.GET("/helloworld", templatesControllers.HelloWorld)
 
 	er.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
