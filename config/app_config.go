@@ -10,16 +10,18 @@ type appConfig struct {
 	accessSecretKey  string
 	refreshSecretKey string
 	datasource       string
+	runMigration     bool
 }
 
 func newAppConfig(port int, accessSecretKey string,
-	refreshSecretKey string, datasource string) (appConfig, error) {
+	refreshSecretKey string, datasource string, runMigration bool) (appConfig, error) {
 
 	ac := appConfig{
 		port:             port,
 		accessSecretKey:  accessSecretKey,
 		refreshSecretKey: refreshSecretKey,
 		datasource:       datasource,
+		runMigration:     runMigration,
 	}
 
 	return ac, nil
@@ -40,6 +42,7 @@ func LoadApplicationConfig() error {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("app.port", 8080)
+	viper.SetDefault("database.migrate", false)
 
 	if err := viper.ReadInConfig(); err != nil {
 		if confErr, ok := err.(viper.ConfigFileNotFoundError); ok {
@@ -73,6 +76,7 @@ func LoadApplicationConfig() error {
 		viper.GetString("app.access_secret_key"),
 		viper.GetString("app.refresh_secret_key"),
 		datasource,
+		viper.GetBool("database.migrate"),
 	)
 
 	if err != nil {
@@ -86,3 +90,4 @@ func GetPort() int                { return globalConfig.port }
 func GetAccessSecretKey() string  { return globalConfig.accessSecretKey }
 func GetRefreshSecretKey() string { return globalConfig.refreshSecretKey }
 func GetDataSourceUri() string    { return globalConfig.datasource }
+func ShallRunMigration() bool     { return globalConfig.runMigration }
