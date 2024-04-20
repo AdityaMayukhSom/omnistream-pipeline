@@ -28,4 +28,6 @@ application.yml
 .vscode
 .idea
 
+# docs can be generated using swaggo's echo-swagger 
+# using the commnd line tool `swag init`
 docs/
