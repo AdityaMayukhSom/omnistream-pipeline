@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"devstream.in/pixelated-pipeline/config"
-	"devstream.in/pixelated-pipeline/database/entities"
+	"devstream.in/pixelated-pipeline/database/repositories"
 	"devstream.in/pixelated-pipeline/services/models"
 
 	"github.com/charmbracelet/log"
@@ -55,9 +55,9 @@ func NewPostgresDatabase() *PostgresDatabase {
 
 func (psql *PostgresDatabase) Migrate() {
 	psql.gormDB.AutoMigrate(
-		&entities.User{},
-		&entities.Post{},
-		&entities.Token{},
+		&repositories.UserEntity{},
+		&repositories.PostEntity{},
+		&repositories.TokenEntity{},
 	)
 }
 
