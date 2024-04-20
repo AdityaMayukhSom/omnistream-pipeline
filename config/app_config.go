@@ -12,10 +12,24 @@ type appConfig struct {
 	datasource       string
 }
 
-var globalConfig *appConfig
+func newAppConfig(port int, accessSecretKey string,
+	refreshSecretKey string, datasource string) (appConfig, error) {
+
+	ac := appConfig{
+		port:             port,
+		accessSecretKey:  accessSecretKey,
+		refreshSecretKey: refreshSecretKey,
+		datasource:       datasource,
+	}
+
+	return ac, nil
+}
+
+var globalConfig appConfig
 
 // LoadConfig reads configuration from file or environment variables.
 func LoadApplicationConfig() error {
+
 	viper.AddConfigPath("/etc/secrets")
 	viper.AddConfigPath(".")
 
@@ -38,23 +52,31 @@ func LoadApplicationConfig() error {
 		}
 	}
 
-	globalConfig.port = viper.GetInt("app.port")
-	globalConfig.accessSecretKey = viper.GetString("app.access_secret_key")
-	globalConfig.refreshSecretKey = viper.GetString("app.refresh_secret_key")
-
-	if databaseConfig, err := newDatabaseConfig(
+	databaseConfig, err := newDatabaseConfig(
 		viper.GetString("database.vendor"),
 		viper.GetString("database.username"),
 		viper.GetString("database.password"),
 		viper.GetString("database.url"),
 		viper.GetString("database.database_name"),
-	); err != nil {
-		datasource, err := databaseConfig.createDataSourceUri()
-		if err != nil {
-			return nil
-		}
+	)
+	if err != nil {
+		return err
+	}
 
-		globalConfig.datasource = datasource
+	datasource, err := databaseConfig.createDataSourceUri()
+	if err != nil {
+		return err
+	}
+
+	globalConfig, err = newAppConfig(
+		viper.GetInt("app.port"),
+		viper.GetString("app.access_secret_key"),
+		viper.GetString("app.refresh_secret_key"),
+		datasource,
+	)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

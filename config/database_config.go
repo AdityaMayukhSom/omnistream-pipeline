@@ -11,12 +11,23 @@ type databaseConfig struct {
 }
 
 func newDatabaseConfig(vendor string, username string, password string,
-	baseurl string, databaseName string) (*databaseConfig, error) {
-	if vendor == "" || username == "" || password == "" || baseurl == "" {
-		return nil, fmt.Errorf("database vendor name cannot be empty")
+	baseurl string, databaseName string) (databaseConfig, error) {
+	if vendor == "" {
+		return databaseConfig{}, fmt.Errorf("database vendor cannot be empty")
+	}
+	if username == "" {
+		return databaseConfig{}, fmt.Errorf("database username cannot be empty")
+	}
+	// password can be empty in some cases, so commenting this out
+	// if password == ""  {
+	// 	return databaseConfig{}, fmt.Errorf("database vendor name cannot be empty")
+	// }
+
+	if baseurl == "" {
+		return databaseConfig{}, fmt.Errorf("database url cannot be empty")
 	}
 
-	dc := &databaseConfig{
+	dc := databaseConfig{
 		vendor:       vendor,
 		username:     username,
 		password:     password,
