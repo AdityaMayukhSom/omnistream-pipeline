@@ -1,5 +1,8 @@
 package controllers
 
+type ResponseRegisteredUser struct {
+}
+
 type ResponseCreatedPost struct {
 }
 
@@ -19,4 +22,8 @@ type ResponseUpdatedPost struct {
 }
 
 type ResponseUpdatedUser struct {
+}
+
+type ResponseError struct {
+	ErrorMessage string
 }
