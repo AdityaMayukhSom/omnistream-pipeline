@@ -58,6 +58,7 @@ func (psql *PostgresDatabase) Migrate() {
 		&repositories.UserEntity{},
 		&repositories.PostEntity{},
 		&repositories.TokenEntity{},
+		&repositories.CommentEntity{},
 	)
 }
 
@@ -84,6 +85,7 @@ func (psql *PostgresDatabase) Close() {
 	Db, err := psql.gormDB.DB()
 	if err != nil {
 		// do something useful
+		panic(err)
 	}
 
 	Db.Close()
