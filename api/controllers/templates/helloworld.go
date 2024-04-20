@@ -7,7 +7,7 @@ import (
 )
 
 func HelloWorld(c echo.Context) error {
-	return c.Render(http.StatusOK, "helloworld.html", map[string]interface{}{
+	return c.Render(http.StatusOK, "helloworld.go.html", map[string]interface{}{
 		"message": "Hello from Rendered Views",
 	})
 
