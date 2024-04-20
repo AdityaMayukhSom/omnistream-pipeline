@@ -22,12 +22,12 @@ func (UserEntity) TableName() string {
 }
 
 type UserRepository interface {
-	FindUserByUsername(username string)
-	FindUserByEmail(email string)
+	FindUserByUsername(username string) (models.User, error)
+	FindUserByEmail(email string) (models.User, error)
 
-	DeleteUserByUsername(username string)
-	DeleteUserByEmail(email string)
+	DeleteUserByUsername(username string) (bool, error)
+	DeleteUserByEmail(email string) (bool, error)
 
-	CreateUser(user models.User)
-	UpdateUser(user models.User)
+	CreateUser(user models.User) (models.User, error)
+	UpdateUser(user models.User) (models.User, error)
 }

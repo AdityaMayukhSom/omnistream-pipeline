@@ -62,16 +62,29 @@ func (psql *PostgresDatabase) Migrate() {
 	)
 }
 
-func (psql *PostgresDatabase) FindUserByUsername(username string) {
-
+func (psql *PostgresDatabase) FindUserByUsername(username string) (models.User, error) {
+	return models.User{}, nil
 }
-func (psql *PostgresDatabase) FindUserByEmail(email string) {}
 
-func (psql *PostgresDatabase) DeleteUserByUsername(username string) {}
-func (psql *PostgresDatabase) DeleteUserByEmail(email string)       {}
+func (psql *PostgresDatabase) FindUserByEmail(email string) (models.User, error) {
+	return models.User{}, nil
+}
 
-func (psql *PostgresDatabase) CreateUser(user models.User) {}
-func (psql *PostgresDatabase) UpdateUser(user models.User) {}
+func (psql *PostgresDatabase) DeleteUserByUsername(username string) (bool, error) {
+	return false, nil
+}
+
+func (psql *PostgresDatabase) DeleteUserByEmail(email string) (bool, error) {
+	return false, nil
+}
+
+func (psql *PostgresDatabase) CreateUser(user models.User) (models.User, error) {
+	return models.User{}, nil
+}
+
+func (psql *PostgresDatabase) UpdateUser(user models.User) (models.User, error) {
+	return models.User{}, nil
+}
 
 func (psql *PostgresDatabase) FindPostById(id string)              {}
 func (psql *PostgresDatabase) FindPostsByUsername(username string) {}
