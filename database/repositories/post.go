@@ -7,10 +7,11 @@ import (
 
 type PostEntity struct {
 	gorm.Model
-	Title       string     `gorm:"not null"`
+	Title       string     `gorm:"not null;type:varchar(255);uniqueIndex:authorAndTitleUnique"`
+	Summary     string     `gorm:"type:text"`
 	Content     string     `gorm:"not null;type:text"`
-	IsPublished bool       `gorm:"not null"`
-	UserID      string     `gorm:"index"`
+	IsPublished bool       `gorm:"not null;type:bool"`
+	UserId      string     `gorm:"not null;uniqueIndex:authorAndTitleUnique"`
 	User        UserEntity `gorm:"foreignKey:user_id;references:username"`
 }
 

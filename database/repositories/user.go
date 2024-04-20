@@ -7,13 +7,13 @@ import (
 )
 
 type UserEntity struct {
-	Name      string `gorm:"not null;size:64"`
-	Email     string `gorm:"uniqueIndex;not null;size:255"`
-	Username  string `gorm:"primaryKey;not null;unique"`
-	Password  string `gorm:"not null;size:32"`
+	Name      string       `gorm:"not null;size:64"`
+	Email     string       `gorm:"uniqueIndex;not null;size:255"`
+	Username  string       `gorm:"primaryKey;not null;unique;size:64"`
+	Password  string       `gorm:"not null;size:32"`
+	Posts     []PostEntity `gorm:"foreignKey:user_id"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Posts     []PostEntity
 }
 
 // TableName overrides the table name used by UserEntity, see Tabler interface of gorm
