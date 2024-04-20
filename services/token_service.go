@@ -13,7 +13,24 @@ import (
 	"github.com/google/uuid"
 )
 
-func ExtractToken(r *http.Request) string {
+type TokenService interface {
+	GenerateToken(name, email, username interface{}) (*models.Token, error)
+}
+
+func NewTokenService() TokenService {
+	return NewTokenServiceImpl()
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+type TokenServiceImpl struct {
+}
+
+func NewTokenServiceImpl() *TokenServiceImpl {
+	return &TokenServiceImpl{}
+}
+
+func (ts *TokenServiceImpl) ExtractToken(r *http.Request) string {
 	tokenHeaderStr := r.Header.Get("Authorization")
 	fmt.Println(tokenHeaderStr)
 	strSlice := strings.Split(tokenHeaderStr, " ")
@@ -26,16 +43,15 @@ func ExtractToken(r *http.Request) string {
 	return tokenStr
 }
 
-func verifyToken(r *http.Request, secretKey string) (*jwt.Token, error) {
-	tokenStr := ExtractToken(r)
-
+func (ts *TokenServiceImpl) VerifyToken(tokenStr string, secretKey string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-
 		return []byte(secretKey), nil
 	})
+
 	if err != nil {
 		fmt.Println("Failed to verify token.")
 		return nil, err
@@ -44,29 +60,25 @@ func verifyToken(r *http.Request, secretKey string) (*jwt.Token, error) {
 	return token, nil
 }
 
-func CheckTokenValidity(r *http.Request, secretKey string) (*jwt.Token, error) {
-	token, err := verifyToken(r, secretKey)
-	if err != nil {
-		return nil, err
-	}
-	if !token.Valid {
-		fmt.Println("Invalid token.")
+func (ts *TokenServiceImpl) CheckTokenValidity(tokenStr string, secretKey string) (token *jwt.Token, err error) {
+	if token, err = ts.VerifyToken(tokenStr, secretKey); err != nil || !token.Valid {
 		return nil, err
 	}
 	return token, nil
 }
 
-func generateToken(name, email, username interface{}) (*models.Token, error) {
+func (ts *TokenServiceImpl) GenerateToken(name, email, username interface{}) (*models.Token, error) {
 	var err error
 
 	accessSecretKey := config.GetAccessSecretKey()
 	refreshSecretKey := config.GetRefreshSecretKey()
 
-	tokenInfo := &models.Token{}
-	tokenInfo.AccessUuid = uuid.NewString()
-	tokenInfo.AccessExpire = time.Now().Add(time.Minute * 15).Unix()
-	tokenInfo.RefreshUuid = uuid.NewString()
-	tokenInfo.RefreshExpire = time.Now().Add(time.Hour * 24 * 7).Unix()
+	tokenInfo := &models.Token{
+		AccessUuid:    uuid.NewString(),
+		RefreshUuid:   uuid.NewString(),
+		AccessExpire:  time.Now().Add(time.Minute * 15).Unix(),
+		RefreshExpire: time.Now().Add(time.Hour * 24 * 7).Unix(),
+	}
 
 	accessTokenClaims := jwt.MapClaims{}
 	accessTokenClaims["authorized"] = true
@@ -77,16 +89,20 @@ func generateToken(name, email, username interface{}) (*models.Token, error) {
 	accessTokenClaims["exp"] = tokenInfo.AccessExpire
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
 	tokenInfo.AccessToken, err = accessToken.SignedString([]byte(accessSecretKey))
+
 	if err != nil {
 		return nil, errors.New("failed to generate access token")
 	}
 
 	refreshTokenClaims := jwt.MapClaims{}
-	refreshTokenClaims["refresh_uuid"] = uuid.NewString()
+	refreshTokenClaims["refresh_uuid"] = tokenInfo.RefreshUuid
+	refreshTokenClaims["user_name"] = name
+	refreshTokenClaims["user_email"] = email
 	refreshTokenClaims["user_username"] = username
-	refreshTokenClaims["exp"] = time.Now().Add(time.Hour * 24 * 7).Unix()
+	refreshTokenClaims["exp"] = tokenInfo.RefreshExpire
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
 	tokenInfo.RefreshToken, err = refreshToken.SignedString([]byte(refreshSecretKey))
+
 	if err != nil {
 		return nil, errors.New("failed to generate refresh token")
 	}
