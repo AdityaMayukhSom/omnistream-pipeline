@@ -1,20 +1,26 @@
 package controllers
 
 import (
+	"fmt"
+	"net/http"
+
+	"devstream.in/pixelated-pipeline/api/controllers"
 	"github.com/labstack/echo/v4"
 )
 
 func SignUp(c echo.Context) error {
-	// json.NewDecoder(r.Body).Decode(&user)
+	var req controllers.RequestRegisterUser
 
-	// passwordHashByte, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
-	// passwordHashStr := string(passwordHashByte)
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, controllers.ResponseError{
+			ErrorMessage: "could not parse request body",
+		})
+	}
 
-	// w.WriteHeader(http.StatusCreated)
-	// enc, _ := json.Marshal(map[string]interface{}{
-	// 	"message": "successfully signed up the user",
-	// })
-	// w.Write(enc)
+	fmt.Println(req)
 
-	return nil
+	return c.JSON(http.StatusCreated, map[string]any{
+		"message": "user successfully registered",
+	})
 }
