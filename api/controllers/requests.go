@@ -4,6 +4,10 @@ type RequestCreatePost struct {
 }
 
 type RequestRegisterUser struct {
+	Name     string
+	Email    string
+	Username string
+	Password string
 }
 
 type RequestUpdateUser struct {
