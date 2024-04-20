@@ -46,13 +46,18 @@
                 "database_name": {
                     "type": "string",
                     "description": "Name of the database in which details of the blogs will be stored."
+                },
+                "migrate": {
+                    "type": "boolean",
+                    "description": "Whether to run migration scripts during startup of the application or not."
                 }
             },
             "required": [
                 "url",
                 "username",
                 "password",
-                "database_name"
+                "database_name",
+                "migrate"
             ]
         }
     },
