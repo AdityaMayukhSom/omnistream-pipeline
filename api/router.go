@@ -1,8 +1,12 @@
 package api
 
 import (
+	"fmt"
+
 	authControllers "devstream.in/pixelated-pipeline/api/controllers/auth"
 	postControllers "devstream.in/pixelated-pipeline/api/controllers/posts"
+	templatesControllers "devstream.in/pixelated-pipeline/api/controllers/templates"
+	"devstream.in/pixelated-pipeline/config"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -18,7 +22,7 @@ type Router interface {
 }
 
 func NewRouter() Router {
-	return &EchoRouter{}
+	return NewEchoRouter()
 }
 
 // ------------------------------------------------------------------------
@@ -27,8 +31,17 @@ type EchoRouter struct {
 	echo *echo.Echo
 }
 
+func NewEchoRouter() *EchoRouter {
+	return &EchoRouter{
+		echo: echo.New(),
+	}
+}
+
 func (er *EchoRouter) RegisterRoutes() {
 	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	er.echo.Renderer = NewRenderer("./api/views/*.html", true)
+	er.echo.GET("/helloworld", templatesControllers.HelloWorld)
 
 	er.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -61,5 +74,6 @@ func (er *EchoRouter) RegisterRoutes() {
 }
 
 func (er *EchoRouter) Start() {
-	er.echo.Logger.Fatal(er.echo.Start(":1323"))
+	address := fmt.Sprintf(":%d", config.GetPort())
+	er.echo.Logger.Fatal(er.echo.Start(address))
 }
