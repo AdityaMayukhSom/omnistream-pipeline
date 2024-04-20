@@ -38,11 +38,6 @@ func NewEchoRouter() *EchoRouter {
 }
 
 func (er *EchoRouter) RegisterRoutes() {
-	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
-
-	er.echo.Renderer = NewRenderer("./views/*", true)
-	er.echo.GET("/helloworld", templatesControllers.HelloWorld)
-
 	er.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{
@@ -52,6 +47,11 @@ func (er *EchoRouter) RegisterRoutes() {
 			echo.HeaderContentLength,
 		},
 	}))
+
+	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	er.echo.Renderer = NewRenderer("./views/*", true)
+	er.echo.GET("/helloworld", templatesControllers.HelloWorld)
 
 	apiV1 := er.echo.Group("/api/v1")
 
