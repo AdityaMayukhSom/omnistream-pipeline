@@ -10,7 +10,7 @@ type UserEntity struct {
 	Name      string       `gorm:"not null;size:64"`
 	Email     string       `gorm:"uniqueIndex;not null;size:255"`
 	Username  string       `gorm:"primaryKey;not null;unique;size:64"`
-	Password  string       `gorm:"not null;size:32"`
+	Password  string       `gorm:"not null;size:60"`
 	Posts     []PostEntity `gorm:"foreignKey:user_id"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -28,6 +28,6 @@ type UserRepository interface {
 	DeleteUserByUsername(username string) (bool, error)
 	DeleteUserByEmail(email string) (bool, error)
 
-	CreateUser(user models.User) (models.User, error)
+	CreateUser(user models.User) (string, error)
 	UpdateUser(user models.User) (models.User, error)
 }
