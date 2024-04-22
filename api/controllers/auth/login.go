@@ -1,71 +1,55 @@
 package controllers
 
 import (
+	"net/http"
+
+	"devstream.in/pixelated-pipeline/api/controllers"
+	service "devstream.in/pixelated-pipeline/services"
+	"devstream.in/pixelated-pipeline/services/models"
 	"github.com/labstack/echo/v4"
 )
 
 func LogIn(c echo.Context) error {
-	// var receivedUser models.User
-	// json.NewDecoder(r.Body).Decode(&receivedUser)
+	var req controllers.RequestLoginUser
 
-	// existingUser, err := repositories.RetrieveUserByEmail(receivedUser.Email)
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, controllers.ResponseError{
+			ErrorMessage: "could not parse request body",
+		})
+	}
 
-	// if err != nil {
+	userService := service.NewUserService()
 
-	// 	log.Error("could not retrieve user details for given email", "email", receivedUser.Email)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	enc, _ := json.Marshal(map[string]interface{}{
-	// 		"message": err.Error(),
-	// 	})
-	// 	w.Write(enc)
-	// 	return
-	// }
+	// TODO: LoginCredential shouldn't be created manually, rather some mapper
+	// object shall do the mapping between request to login credentials automatically
+	tokenStruct, err := userService.LoginUser(models.LoginCredential{
+		Username: req.Username,
+		Password: req.Password,
+	})
 
-	// pwMatchErr := bcrypt.CompareHashAndPassword(
-	// 	[]byte(existingUser.Password),
-	// 	[]byte(receivedUser.Password),
-	// )
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, controllers.ResponseError{
+			ErrorMessage: err.Error(),
+		})
+	}
 
-	// if pwMatchErr != nil {
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	enc, _ := json.Marshal(map[string]interface{}{
-	// 		"message": "password does not match",
-	// 	})
-	// 	w.Write(enc)
-	// }
+	accessCookie := http.Cookie{
+		HttpOnly: true,
+		Name:     "accessToken",
+		Value:    tokenStruct.AccessToken,
+	}
 
-	// name := existingUser.Name
-	// email := existingUser.Email
-	// username := existingUser.Username
+	refreshCookie := http.Cookie{
+		HttpOnly: true,
+		Name:     "refreshToken",
+		Value:    tokenStruct.RefreshToken,
+		Path:     "/auth/",
+	}
 
-	// tokenStruct, err := generateToken(name, email, username)
+	c.SetCookie(&accessCookie)
+	c.SetCookie(&refreshCookie)
+	c.Redirect(http.StatusFound, "/homepage.html")
 
-	// if err != nil {
-	// 	log.Error("could not generate acces token for given email", "email", receivedUser.Email)
-	// 	w.WriteHeader(http.StatusInternalServerError)
-	// 	enc, _ := json.Marshal(map[string]interface{}{
-	// 		"message": "could not login successfully, try again",
-	// 	})
-	// 	w.Write(enc)
-	// 	return
-	// }
-
-	// accessToken := tokenStruct.AccessToken
-	// refreshToken := tokenStruct.RefreshToken
-	// cookie := http.Cookie{
-	// 	HttpOnly: true,
-	// 	Name:     "refreshToken",
-	// 	Value:    refreshToken,
-	// 	// Domain:   "jpoly1219devbox.xyz",
-	// 	Path: "/auth/",
-	// }
-
-	// http.SetCookie(w, &cookie)
-	// w.WriteHeader(http.StatusOK)
-	// enc, _ := json.Marshal(map[string]interface{}{
-	// 	"message":     "user successfully logged in",
-	// 	"accessToken": accessToken,
-	// })
-	// w.Write(enc)
 	return nil
 }
