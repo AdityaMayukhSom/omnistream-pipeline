@@ -83,13 +83,23 @@ func (psql *PostgresDatabase) DeleteUserByEmail(email string) (bool, error) {
 	return false, nil
 }
 
-func (psql *PostgresDatabase) CreateUser(user models.User) (models.User, error) {
-	return models.User{}, nil
+func (psql *PostgresDatabase) CreateUser(userDetails models.User) (string, error) {
+	user := repositories.UserEntity{
+		Username: userDetails.Username,
+		Name:     userDetails.Name,
+		Password: userDetails.Password,
+		Email:    userDetails.Email,
+	}
+
+	result := psql.gormDB.Create(&user)
+	return user.Username, result.Error
 }
 
 func (psql *PostgresDatabase) UpdateUser(user models.User) (models.User, error) {
 	return models.User{}, nil
 }
+
+// -------------------------------------------------------------
 
 func (psql *PostgresDatabase) FindPostById(id string)              {}
 func (psql *PostgresDatabase) FindPostsByUsername(username string) {}
