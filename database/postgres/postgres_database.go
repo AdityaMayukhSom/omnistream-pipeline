@@ -63,7 +63,12 @@ func (psql *PostgresDatabase) Migrate() {
 }
 
 func (psql *PostgresDatabase) FindUserByUsername(username string) (models.User, error) {
-	return models.User{}, nil
+	var user models.User
+	result := psql.gormDB.First(&user, "username = ?", username)
+	if result.Error != nil {
+		return user, result.Error
+	}
+	return user, nil
 }
 
 func (psql *PostgresDatabase) FindUserByEmail(email string) (models.User, error) {
