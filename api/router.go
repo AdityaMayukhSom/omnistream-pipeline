@@ -64,6 +64,7 @@ func (er *EchoRouter) RegisterRoutes() {
 	authRoute.POST("/register", authControllers.SignUp)
 	authRoute.POST("/login", authControllers.LogIn)
 	authRoute.POST("/refresh", authControllers.Refresh)
+	authRoute.GET("/logout", authControllers.LogOut)
 
 	restrictedRoute := apiV1.Group("/")
 	restrictedRoute.Use(echojwt.WithConfig(echojwt.Config{
