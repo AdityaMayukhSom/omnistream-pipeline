@@ -30,16 +30,12 @@ func NewTokenServiceImpl() *TokenServiceImpl {
 	return &TokenServiceImpl{}
 }
 
-func (ts *TokenServiceImpl) ExtractToken(r *http.Request) string {
+func (ts *TokenServiceImpl) ExtractToken(r *http.Request) (tokenStr string) {
 	tokenHeaderStr := r.Header.Get("Authorization")
-	fmt.Println(tokenHeaderStr)
 	strSlice := strings.Split(tokenHeaderStr, " ")
-	var tokenStr string
 	if len(strSlice) == 2 {
 		tokenStr = strSlice[1]
 	}
-
-	fmt.Println(tokenStr)
 	return tokenStr
 }
 
