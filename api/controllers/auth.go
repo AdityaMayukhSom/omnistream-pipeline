@@ -1,8 +1,95 @@
 package controllers
 
 import (
+	"fmt"
+	"net/http"
+
+	"devstream.in/pixelated-pipeline/api/dto"
+	service "devstream.in/pixelated-pipeline/services"
+	"devstream.in/pixelated-pipeline/services/models"
 	"github.com/labstack/echo/v4"
 )
+
+func SignUp(c echo.Context) (err error) {
+	var req dto.RequestRegisterUser
+
+	err = c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, dto.ResponseError{
+			ErrorMessage: "could not parse request body",
+		})
+	}
+
+	fmt.Println(req)
+
+	userService := service.NewUserService()
+
+	err = userService.RegisterUser(models.User{
+		Username: req.Username,
+		Name:     req.Name,
+		Password: req.Password,
+		Email:    req.Email,
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, dto.ResponseError{
+			ErrorMessage: err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, map[string]any{
+		"message": "user successfully registered",
+	})
+}
+
+func LogOut(c echo.Context) error {
+	return nil
+}
+
+func LogIn(c echo.Context) error {
+	var req dto.RequestLoginUser
+
+	err := c.Bind(&req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, dto.ResponseError{
+			ErrorMessage: "could not parse request body",
+		})
+	}
+
+	userService := service.NewUserService()
+
+	// TODO: LoginCredential shouldn't be created manually, rather some mapper
+	// object shall do the mapping between request to login credentials automatically
+	tokenStruct, err := userService.LoginUser(models.LoginCredential{
+		Username: req.Username,
+		Password: req.Password,
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, dto.ResponseError{
+			ErrorMessage: err.Error(),
+		})
+	}
+
+	accessCookie := http.Cookie{
+		HttpOnly: true,
+		Name:     "accessToken",
+		Value:    tokenStruct.AccessToken,
+	}
+
+	refreshCookie := http.Cookie{
+		HttpOnly: true,
+		Name:     "refreshToken",
+		Value:    tokenStruct.RefreshToken,
+		Path:     "/auth/",
+	}
+
+	c.SetCookie(&accessCookie)
+	c.SetCookie(&refreshCookie)
+	c.Redirect(http.StatusFound, "/homepage.html")
+
+	return nil
+}
 
 func Refresh(c echo.Context) error {
 	// get refreshToken from cookie

@@ -1,4 +1,4 @@
-package controllers
+package dto
 
 type RequestCreatePost struct {
 }

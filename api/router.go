@@ -3,9 +3,7 @@ package api
 import (
 	"fmt"
 
-	authControllers "devstream.in/pixelated-pipeline/api/controllers/auth"
-	postControllers "devstream.in/pixelated-pipeline/api/controllers/posts"
-	templatesControllers "devstream.in/pixelated-pipeline/api/controllers/templates"
+	"devstream.in/pixelated-pipeline/api/controllers"
 	"devstream.in/pixelated-pipeline/config"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -53,27 +51,27 @@ func (er *EchoRouter) RegisterRoutes() {
 	er.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	er.echo.Renderer = NewRenderer("./views/*", true)
-	er.echo.GET("/hello-world", templatesControllers.HelloWorld)
+	er.echo.GET("/hello-world", controllers.HelloWorld)
 
 	apiV1 := er.echo.Group("/api/v1")
 
-	apiV1.GET("/posts", postControllers.ReturnAllPosts)
-	apiV1.GET("/posts/:username/:postname", postControllers.ReturnSinglePost)
+	apiV1.GET("/posts", controllers.ReturnAllPosts)
+	apiV1.GET("/posts/:username/:postname", controllers.ReturnSinglePost)
 
 	authRoute := apiV1.Group("/auth")
-	authRoute.POST("/register", authControllers.SignUp)
-	authRoute.POST("/login", authControllers.LogIn)
-	authRoute.POST("/refresh", authControllers.Refresh)
-	authRoute.GET("/logout", authControllers.LogOut)
+	authRoute.POST("/register", controllers.SignUp)
+	authRoute.POST("/login", controllers.LogIn)
+	authRoute.POST("/refresh", controllers.Refresh)
+	authRoute.GET("/logout", controllers.LogOut)
 
 	restrictedRoute := apiV1.Group("/")
 	restrictedRoute.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte("secret"),
 	}))
 
-	restrictedRoute.POST("/posts", postControllers.CreatePost)
-	restrictedRoute.DELETE("/posts/{id}", postControllers.DeletePost)
-	restrictedRoute.PUT("/posts/{id}", postControllers.UpdatePost)
+	restrictedRoute.POST("/posts", controllers.CreatePost)
+	restrictedRoute.DELETE("/posts/{id}", controllers.DeletePost)
+	restrictedRoute.PUT("/posts/{id}", controllers.UpdatePost)
 }
 
 func (er *EchoRouter) Start() {

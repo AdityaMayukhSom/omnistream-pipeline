@@ -1,8 +1,65 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 )
+
+func CreatePost(c echo.Context) error {
+
+	// var post models.Post
+	// json.NewDecoder(r.Body).Decode(&post)
+
+	// usernameToIdResults, err := repositories.Db.Query(
+	// 	"SELECT id FROM users WHERE username = $1;",
+	// 	post.Author,
+	// )
+
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// for usernameToIdResults.Next() {
+	// 	err = usernameToIdResults.Scan(&post.Author)
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// }
+
+	// results, err := repositories.Db.Query(
+	// 	"INSERT INTO posts(title, author, content) VALUES ($1, $2, $3);",
+	// 	post.Title, post.Author, post.Content,
+	// )
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+
+	// for results.Next() {
+	// 	err = results.Scan(&post.Title, &post.Author, &post.Content)
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// }
+
+	// json.NewEncoder(w).Encode(post)
+	return nil
+}
+
+func DeletePost(c echo.Context) error {
+
+	// vars := mux.Vars(r)
+	// keys := vars["id"]
+
+	// _, err := repositories.Db.Query(
+	// 	"DELETE FROM posts WHERE id = $1;",
+	// 	keys,
+	// )
+
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	return c.JSON(http.StatusOK, map[string]any{"deleted": 100})
+}
 
 func ReturnAllPosts(c echo.Context) error {
 	// fmt.Println("returning all posts...")
@@ -191,5 +248,33 @@ func ReturnUserPosts(c echo.Context) error {
 	// }
 
 	// json.NewEncoder(w).Encode(posts)
+	return nil
+}
+
+func UpdatePost(c echo.Context) error {
+
+	// vars := mux.Vars(r)
+	// keys := vars["id"]
+
+	// var updatedPost models.Post
+	// json.NewDecoder(r.Body).Decode(&updatedPost)
+
+	// results, err := repositories.Db.Query(
+	// 	"UPDATE posts SET title=$1, content=$2 WHERE id=$3;",
+	// 	updatedPost.Title, updatedPost.Content, keys,
+	// )
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+
+	// var post models.Post
+	// for results.Next() {
+	// 	err = results.Scan(&post.ID, &post.Title, &post.Author, &post.Content)
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// }
+
+	// json.NewEncoder(w).Encode(post)
 	return nil
 }
