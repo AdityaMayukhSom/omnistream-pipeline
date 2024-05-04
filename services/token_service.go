@@ -40,13 +40,22 @@ func (ts *TokenServiceImpl) ExtractToken(r *http.Request) (tokenStr string) {
 }
 
 func (ts *TokenServiceImpl) VerifyToken(tokenStr string, secretKey string) (*jwt.Token, error) {
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+
+	// custom function to return the
+	keyFunc := func(token *jwt.Token) (interface{}, error) {
+		// for the given token, which will be passes to this function, if the signing algorithm
+		// for the parsed token is not of type HMAC, then it will return an error.
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
+
+		// returns the key for validating the token, can be access token secret or refresh token
+		// secret depending upon the usecase and the key to be verified.
 		return []byte(secretKey), nil
-	})
+	}
+
+	token, err := jwt.Parse(tokenStr, keyFunc)
 
 	if err != nil {
 		fmt.Println("Failed to verify token.")
