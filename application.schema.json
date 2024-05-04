@@ -32,10 +32,16 @@
                         "mysql",
                         "postgres",
                         "mariadb"
-                    ]
+                    ],
+                    "description": "Which type of database vendor is being used by the project."
                 },
                 "url": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The URL to which connect to the database from the application.",
+                    "examples": [
+                        "localhost:5432",
+                        "localhost:3306"
+                    ]
                 },
                 "username": {
                     "type": "string"
@@ -53,6 +59,7 @@
                 }
             },
             "required": [
+                "vendor",
                 "url",
                 "username",
                 "password",
