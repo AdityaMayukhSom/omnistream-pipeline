@@ -5,30 +5,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type appConfig struct {
-	port             int
-	accessSecretKey  string
-	refreshSecretKey string
-	datasource       string
-	runMigration     bool
-}
-
-func newAppConfig(port int, accessSecretKey string,
-	refreshSecretKey string, datasource string, runMigration bool) (appConfig, error) {
-
-	ac := appConfig{
-		port:             port,
-		accessSecretKey:  accessSecretKey,
-		refreshSecretKey: refreshSecretKey,
-		datasource:       datasource,
-		runMigration:     runMigration,
-	}
-
-	return ac, nil
-}
-
-var globalConfig appConfig
-
 // LoadConfig reads configuration from file or environment variables.
 func LoadApplicationConfig() error {
 
@@ -86,6 +62,8 @@ func LoadApplicationConfig() error {
 	return nil
 }
 
+// Returns the port on which the application runs.
+// Call `config.LoadConfig()` before running.
 func GetPort() int                { return globalConfig.port }
 func GetAccessSecretKey() string  { return globalConfig.accessSecretKey }
 func GetRefreshSecretKey() string { return globalConfig.refreshSecretKey }
