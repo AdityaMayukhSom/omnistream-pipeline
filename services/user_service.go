@@ -10,7 +10,13 @@ import (
 )
 
 type UserService interface {
+	// Returns a valid token for the user if the login is successful, i.e.
+	// the credentials are valid and a nil error. If the credentials are
+	// invalid or server error happens, returns a non nil error.
 	LoginUser(credentials models.LoginCredential) (*models.Token, error)
+
+	// Registers the user into the database. If a user with same credentials
+	// already exists, returns a non null error value.
 	RegisterUser(user models.User) error
 }
 
