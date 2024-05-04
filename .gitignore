@@ -25,7 +25,6 @@ main
 application.yml
 
 # code editor specific directories
-.vscode
 .idea
 
 # docs can be generated using swaggo's echo-swagger 
