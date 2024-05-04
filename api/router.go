@@ -56,7 +56,7 @@ func (er *EchoRouter) RegisterRoutes() {
 }
 
 func (er *EchoRouter) registerWebRoutes() {
-	er.echo.Renderer = NewRenderer("./views/*", true)
+	er.echo.Renderer = controllers.NewRenderer("./views/*", true)
 
 	// Group made out from the same path as the base echo router
 	fileRoutes := er.echo.Group("")
