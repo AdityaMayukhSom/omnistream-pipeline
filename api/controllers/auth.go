@@ -41,10 +41,6 @@ func SignUp(c echo.Context) (err error) {
 	})
 }
 
-func LogOut(c echo.Context) error {
-	return nil
-}
-
 func LogIn(c echo.Context) error {
 	var req dto.RequestLoginUser
 
@@ -70,31 +66,59 @@ func LogIn(c echo.Context) error {
 		})
 	}
 
-	accessCookie := http.Cookie{
+	accessCookie := &http.Cookie{
+		SameSite: http.SameSiteStrictMode,
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameAccessToken,
 		Value:    tokenStruct.AccessToken,
+		Path:     "/",
 		Expires:  time.Now().Add(time.Minute * 15),
+		// Secure: true, // when true browser only transmit the cookie over https channel
 	}
 
-	refreshCookie := http.Cookie{
+	refreshCookie := &http.Cookie{
+		SameSite: http.SameSiteStrictMode,
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameRefreshToken,
 		Value:    tokenStruct.RefreshToken,
-		Path:     "/auth/",
+		Path:     "/api/v1/auth/", // matches api version 1, TODO : to match any api auth version
 		Expires:  time.Now().Add(time.Hour * 24 * 7),
+		// Secure: true, // when true browser only transmit the cookie over https channel
 	}
 
-	c.SetCookie(&accessCookie)
-	c.SetCookie(&refreshCookie)
+	c.SetCookie(accessCookie)
+	c.SetCookie(refreshCookie)
 
 	// actually not helpful in case of api responses
 	// TODO: redirect based on where the request is coming
 	// IDEA: we can set cookie if the request is coming from the web application
 	// otherwise we can simply return with a json data containing the signed tokens
-	c.Redirect(http.StatusFound, "/homepage")
+	return c.Redirect(http.StatusSeeOther, apiConstant.DefaultAuthenticatedRoute)
+}
 
-	return nil
+func LogOut(c echo.Context) error {
+	accessCookie := &http.Cookie{
+		HttpOnly: true,
+		Name:     apiConstant.CookieNameAccessToken,
+		Value:    "",
+		MaxAge:   -1,
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+	}
+
+	refreshCookie := &http.Cookie{
+		HttpOnly: true,
+		Name:     apiConstant.CookieNameRefreshToken,
+		Value:    "",
+		MaxAge:   -1,
+		Path:     "/api/v1/auth/",
+		Expires:  time.Unix(0, 0),
+	}
+
+	c.SetCookie(accessCookie)
+	c.SetCookie(refreshCookie)
+
+	return c.Redirect(http.StatusSeeOther, apiConstant.DefaultUnauthenticatedRoute)
 }
 
 func Refresh(c echo.Context) error {

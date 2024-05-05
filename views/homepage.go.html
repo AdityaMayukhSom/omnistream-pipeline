@@ -5,7 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Homepage | Pixelated Project</title>
     </head>
+
     <body>
         This is Homepage, this should be protected if not logged in!
+        <form action="/api/v1/auth/logout" method="post">
+            <button type="submit">Logout</button>
+        </form>
     </body>
 </html>
