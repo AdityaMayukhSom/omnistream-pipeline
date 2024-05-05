@@ -24,7 +24,7 @@ func WithAuthentication(next echo.HandlerFunc) echo.HandlerFunc {
 			tokenService := services.NewTokenService()
 			if username, err := tokenService.ValidateToken(tokenCookie.Value, config.GetAccessSecretKey()); err == nil {
 				c.SetCookie(tokenCookie)
-				c.Set(apiConstant.ContextAttributeKeyName, username)
+				c.Set(apiConstant.ContextAttributeKeyUsername, username)
 				return next(c)
 			}
 		}
@@ -43,7 +43,7 @@ func WithAlreadyAuthenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			tokenService := services.NewTokenService()
 			if username, err := tokenService.ValidateToken(tokenCookie.Value, config.GetAccessSecretKey()); err == nil {
 				c.SetCookie(tokenCookie)
-				c.Set(apiConstant.ContextAttributeKeyName, username)
+				c.Set(apiConstant.ContextAttributeKeyUsername, username)
 				return c.Redirect(http.StatusSeeOther, apiConstant.DefaultAuthenticatedRoute)
 			}
 		}
