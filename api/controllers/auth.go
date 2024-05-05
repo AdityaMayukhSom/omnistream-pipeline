@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	apiConstant "devstream.in/pixelated-pipeline/api/constants"
 	"devstream.in/pixelated-pipeline/api/dto"
-	service "devstream.in/pixelated-pipeline/services"
+	"devstream.in/pixelated-pipeline/services"
 	"devstream.in/pixelated-pipeline/services/models"
 	"github.com/labstack/echo/v4"
 )
@@ -20,7 +21,7 @@ func SignUp(c echo.Context) (err error) {
 		})
 	}
 
-	userService := service.NewUserService()
+	userService := services.NewUserService()
 
 	err = userService.RegisterUser(models.User{
 		Username: req.Username,
@@ -54,7 +55,7 @@ func LogIn(c echo.Context) error {
 		})
 	}
 
-	userService := service.NewUserService()
+	userService := services.NewUserService()
 
 	// TODO: LoginCredential shouldn't be created manually, rather some mapper
 	// object shall do the mapping between request to login credentials automatically
@@ -73,6 +74,7 @@ func LogIn(c echo.Context) error {
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameAccessToken,
 		Value:    tokenStruct.AccessToken,
+		Expires:  time.Now().Add(time.Minute * 15),
 	}
 
 	refreshCookie := http.Cookie{
@@ -80,6 +82,7 @@ func LogIn(c echo.Context) error {
 		Name:     apiConstant.CookieNameRefreshToken,
 		Value:    tokenStruct.RefreshToken,
 		Path:     "/auth/",
+		Expires:  time.Now().Add(time.Hour * 24 * 7),
 	}
 
 	c.SetCookie(&accessCookie)
