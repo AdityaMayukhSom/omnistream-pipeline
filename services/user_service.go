@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"devstream.in/pixelated-pipeline/database"
+	serviceConstant "devstream.in/pixelated-pipeline/services/constants"
 	"devstream.in/pixelated-pipeline/services/models"
 	"github.com/charmbracelet/log"
 	"golang.org/x/crypto/bcrypt"
@@ -52,9 +53,9 @@ func (us *UserServiceImpl) LoginUser(credentials models.LoginCredential) (*model
 
 	tokenService := NewTokenService()
 	tokenStruct, err := tokenService.GenerateToken(
-		existingUser.Name,
-		existingUser.Email,
-		existingUser.Username,
+		WithClaim(serviceConstant.ClaimKeyEmail, existingUser.Email),
+		WithClaim(serviceConstant.ClaimKeyName, existingUser.Name),
+		WithClaim(serviceConstant.ClaimKeyUsername, existingUser.Username),
 	)
 
 	if err != nil {
