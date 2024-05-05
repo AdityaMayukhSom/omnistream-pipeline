@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"devstream.in/pixelated-pipeline/config"
+	serviceConstant "devstream.in/pixelated-pipeline/services/constants"
 	"devstream.in/pixelated-pipeline/services/models"
 	"github.com/charmbracelet/log"
 	"github.com/dgrijalva/jwt-go"
@@ -33,8 +34,10 @@ type TokenService interface {
 	GenerateToken(claims ...TokenClaim) (*models.Token, error)
 
 	// Validates the [tokenStr] with the [secretKey]. If the token is valid and not expired
-	// yet, returns a nil error. Otherwise is the token cannot be parsed or
-	ValidateToken(tokenStr string, secretKey string) error
+	// yet, returns a nil error along with the username of the person. Otherwise if the token
+	// cannot be parsed, expired or the algorithm used to sign does not match, returns an non
+	// nil error.
+	ValidateToken(tokenStr string, secretKey string) (string, error)
 }
 
 // Returns a new instance of a specific implementation of the token service interface.
@@ -51,7 +54,7 @@ func NewTokenServiceImpl() *TokenServiceImpl {
 	return &TokenServiceImpl{}
 }
 
-func (ts *TokenServiceImpl) ValidateToken(tokenStr string, secretKey string) error {
+func (ts *TokenServiceImpl) ValidateToken(tokenStr string, secretKey string) (string, error) {
 	// Custom function to return the key which was used to sign the jwt.Token
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		// The given tokenStr will be parsed and passed to this function. If the signing algorithm
@@ -71,14 +74,16 @@ func (ts *TokenServiceImpl) ValidateToken(tokenStr string, secretKey string) err
 
 	if err != nil {
 		log.Error("failed to verify token", "token", tokenStr)
-		return err
+		return "", err
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("invalid token")
+		return "", fmt.Errorf("invalid token")
 	}
 
-	return nil
+	claims := token.Claims.(jwt.MapClaims)
+
+	return claims[serviceConstant.ClaimKeyUsername].(string), nil
 }
 
 func (ts *TokenServiceImpl) GenerateToken(claims ...TokenClaim) (tokenInfo *models.Token, err error) {
@@ -88,8 +93,8 @@ func (ts *TokenServiceImpl) GenerateToken(claims ...TokenClaim) (tokenInfo *mode
 	tokenInfo = &models.Token{
 		AccessUuid:    uuid.NewString(),
 		RefreshUuid:   uuid.NewString(),
-		AccessExpire:  time.Now().Add(time.Minute * 15).Unix(),
-		RefreshExpire: time.Now().Add(time.Hour * 24 * 7).Unix(),
+		AccessExpire:  time.Now().Add(time.Minute * 15),
+		RefreshExpire: time.Now().Add(time.Hour * 24 * 7),
 	}
 
 	accessTokenClaims := jwt.MapClaims{}
@@ -97,10 +102,14 @@ func (ts *TokenServiceImpl) GenerateToken(claims ...TokenClaim) (tokenInfo *mode
 	for _, claim := range claims {
 		accessTokenClaims[claim.key] = claim.value
 	}
-	accessTokenClaims["authorized"] = true
-	accessTokenClaims["access_uuid"] = tokenInfo.AccessUuid
-	accessTokenClaims["exp"] = tokenInfo.AccessExpire
+
+	accessTokenClaims[serviceConstant.ClaimKeyAuthorized] = true
+	accessTokenClaims[serviceConstant.ClaimKeyAccessUUID] = tokenInfo.AccessUuid
+	accessTokenClaims[serviceConstant.ClaimKeyExpiration] = tokenInfo.AccessExpire
+	accessTokenClaims[serviceConstant.ClaimKeyIssuer] = serviceConstant.ClaimValueIssuer
+
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessTokenClaims)
+
 	tokenInfo.AccessToken, err = accessToken.SignedString([]byte(accessSecretKey))
 
 	if err != nil {
@@ -112,9 +121,13 @@ func (ts *TokenServiceImpl) GenerateToken(claims ...TokenClaim) (tokenInfo *mode
 	for _, claim := range claims {
 		refreshTokenClaims[claim.key] = claim.value
 	}
-	refreshTokenClaims["refresh_uuid"] = tokenInfo.RefreshUuid
-	refreshTokenClaims["exp"] = tokenInfo.RefreshExpire
+
+	refreshTokenClaims[serviceConstant.ClaimKeyRefreshUUID] = tokenInfo.RefreshUuid
+	refreshTokenClaims[serviceConstant.ClaimKeyExpiration] = tokenInfo.RefreshExpire
+	refreshTokenClaims[serviceConstant.ClaimKeyIssuer] = serviceConstant.ClaimValueIssuer
+
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
+
 	tokenInfo.RefreshToken, err = refreshToken.SignedString([]byte(refreshSecretKey))
 
 	if err != nil {
