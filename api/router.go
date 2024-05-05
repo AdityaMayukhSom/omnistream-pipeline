@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"devstream.in/pixelated-pipeline/api/controllers"
+	"devstream.in/pixelated-pipeline/api/middlewares"
 	"devstream.in/pixelated-pipeline/config"
-	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	// echoSwagger "github.com/swaggo/echo-swagger"
@@ -76,11 +76,12 @@ func (er *EchoRouter) registerWebRoutes() {
 
 	// Setting up the URLs to serve user facing UIs.
 	// Routes in which static HTML is served.
-	fileRoutes.GET("/login", controllers.DisplayLoginPage)
-	fileRoutes.GET("/signup", controllers.DisplaySignupPage)
+	fileRoutes.GET("/login", controllers.DisplayLoginPage, middlewares.WithAlreadyAuthenticated)
+	fileRoutes.GET("/signup", controllers.DisplaySignupPage, middlewares.WithAlreadyAuthenticated)
 
 	// Routes which internally renders the HTML from templates.
-	fileRoutes.GET("/helloworld", controllers.RenderHelloWorldPage)
+	fileRoutes.GET("/helloworld", controllers.RenderHelloWorldPage, middlewares.WithAuthentication)
+	fileRoutes.GET("/home", controllers.RenderHomePage, middlewares.WithAuthentication)
 
 }
 
@@ -98,9 +99,7 @@ func (er *EchoRouter) registerApiRoutes() {
 	authApiRoute.GET("/logout", controllers.LogOut)
 
 	restrictedApiRoute := apiV1.Group("/")
-	restrictedApiRoute.Use(echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte("secret"),
-	}))
+	restrictedApiRoute.Use(middlewares.WithAuthentication)
 
 	restrictedApiRoute.POST("/posts", controllers.CreatePost)
 	restrictedApiRoute.DELETE("/posts/{id}", controllers.DeletePost)
