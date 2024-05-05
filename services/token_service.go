@@ -95,6 +95,7 @@ func (ts *TokenServiceImpl) GenerateToken(claims ...TokenClaim) (tokenInfo *mode
 		RefreshUuid:   uuid.NewString(),
 		AccessExpire:  time.Now().Add(time.Minute * 15),
 		RefreshExpire: time.Now().Add(time.Hour * 24 * 7),
+		IssuedAt:      time.Now(),
 	}
 
 	accessTokenClaims := jwt.MapClaims{}
