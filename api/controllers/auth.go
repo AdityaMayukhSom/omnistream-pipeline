@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
+	apiConstant "devstream.in/pixelated-pipeline/api/constants"
 	"devstream.in/pixelated-pipeline/api/dto"
 	service "devstream.in/pixelated-pipeline/services"
 	"devstream.in/pixelated-pipeline/services/models"
@@ -19,8 +19,6 @@ func SignUp(c echo.Context) (err error) {
 			ErrorMessage: "could not parse request body",
 		})
 	}
-
-	fmt.Println(req)
 
 	userService := service.NewUserService()
 
@@ -73,20 +71,25 @@ func LogIn(c echo.Context) error {
 
 	accessCookie := http.Cookie{
 		HttpOnly: true,
-		Name:     "accessToken",
+		Name:     apiConstant.CookieNameAccessToken,
 		Value:    tokenStruct.AccessToken,
 	}
 
 	refreshCookie := http.Cookie{
 		HttpOnly: true,
-		Name:     "refreshToken",
+		Name:     apiConstant.CookieNameRefreshToken,
 		Value:    tokenStruct.RefreshToken,
 		Path:     "/auth/",
 	}
 
 	c.SetCookie(&accessCookie)
 	c.SetCookie(&refreshCookie)
-	c.Redirect(http.StatusFound, "/homepage.html")
+
+	// actually not helpful in case of api responses
+	// TODO: redirect based on where the request is coming
+	// IDEA: we can set cookie if the request is coming from the web application
+	// otherwise we can simply return with a json data containing the signed tokens
+	c.Redirect(http.StatusFound, "/homepage")
 
 	return nil
 }
