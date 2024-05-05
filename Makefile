@@ -4,7 +4,7 @@ INPUT_DIR = main.go
 OUTPUT_DIR = ./build/
 
 .PHONY: build
-build: clean
+build: 
 	go build $(FLAGS) -o $(OUTPUT_DIR) $(INPUT_DIR)
 
 .PHONY: clean
