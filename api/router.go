@@ -96,7 +96,7 @@ func (er *EchoRouter) registerApiRoutes() {
 	authApiRoute.POST("/register", controllers.SignUp)
 	authApiRoute.POST("/login", controllers.LogIn)
 	authApiRoute.POST("/refresh", controllers.Refresh)
-	authApiRoute.GET("/logout", controllers.LogOut)
+	authApiRoute.POST("/logout", controllers.LogOut)
 
 	restrictedApiRoute := apiV1.Group("/")
 	restrictedApiRoute.Use(middlewares.WithAuthentication)
