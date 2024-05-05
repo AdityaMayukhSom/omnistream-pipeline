@@ -1,10 +1,13 @@
 package models
 
+import "time"
+
 type Token struct {
 	AccessToken   string
 	RefreshToken  string
 	AccessUuid    string
 	RefreshUuid   string
-	AccessExpire  int64
-	RefreshExpire int64
+	IssuedAt      time.Time
+	AccessExpire  time.Time
+	RefreshExpire time.Time
 }

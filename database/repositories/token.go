@@ -1,12 +1,15 @@
 package repositories
 
+import "time"
+
 type TokenEntity struct {
-	AccessToken   string `json:"accesstoken"`
-	RefreshToken  string `json:"refreshtoken"`
-	AccessUuid    string `json:"accessuuid"`
-	RefreshUuid   string `json:"refreshuuid"`
-	AccessExpire  int64  `json:"accessexpire"`
-	RefreshExpire int64  `json:"refreshexpire"`
+	IssuedAt      time.Time `json:"issued_at"`
+	AccessToken   string    `json:"access_token"`
+	RefreshToken  string    `json:"refresh_token"`
+	AccessUuid    string    `json:"access_uuid"`
+	RefreshUuid   string    `json:"refresh_uuid"`
+	AccessExpire  time.Time `json:"access_expire"`
+	RefreshExpire time.Time `json:"refresh_expire"`
 }
 
 func (TokenEntity) TableName() string {
