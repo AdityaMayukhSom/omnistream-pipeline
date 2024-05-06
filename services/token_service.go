@@ -34,10 +34,10 @@ type TokenService interface {
 	GenerateToken(claims ...TokenClaim) (*models.Token, error)
 
 	// Validates the [tokenStr] with the [secretKey]. If the token is valid and not expired
-	// yet, returns a nil error along with the username of the person. Otherwise if the token
-	// cannot be parsed, expired or the algorithm used to sign does not match, returns an non
-	// nil error.
-	ValidateToken(tokenStr string, secretKey string) (string, error)
+	// yet, returns a nil error along with the username and the name of the person. Otherwise
+	// if the token cannot be parsed, expired or the algorithm used to sign does not match,
+	// returns an non nil error.
+	ValidateToken(tokenStr string, secretKey string) (username string, name string, err error)
 }
 
 // Returns a new instance of a specific implementation of the token service interface.
@@ -54,7 +54,7 @@ func NewTokenServiceImpl() *TokenServiceImpl {
 	return &TokenServiceImpl{}
 }
 
-func (ts *TokenServiceImpl) ValidateToken(tokenStr string, secretKey string) (string, error) {
+func (ts *TokenServiceImpl) ValidateToken(tokenStr string, secretKey string) (username string, name string, err error) {
 	// Custom function to return the key which was used to sign the jwt.Token
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		// The given tokenStr will be parsed and passed to this function. If the signing algorithm
@@ -74,16 +74,18 @@ func (ts *TokenServiceImpl) ValidateToken(tokenStr string, secretKey string) (st
 
 	if err != nil {
 		log.Error("failed to verify token", "token", tokenStr)
-		return "", err
+		return
 	}
 
 	if !token.Valid {
-		return "", fmt.Errorf("invalid token")
+		err = fmt.Errorf("invalid token")
+		return
 	}
 
 	claims := token.Claims.(jwt.MapClaims)
-
-	return claims[serviceConstant.ClaimKeyUsername].(string), nil
+	username = claims[serviceConstant.ClaimKeyUsername].(string)
+	name = claims[serviceConstant.ClaimKeyName].(string)
+	return
 }
 
 func (ts *TokenServiceImpl) GenerateToken(claims ...TokenClaim) (tokenInfo *models.Token, err error) {
