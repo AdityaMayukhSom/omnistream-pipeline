@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "esbenp.prettier-vscode",
         "golang.go",
         "redhat.vscode-yaml"
     ]
