@@ -10,5 +10,7 @@
     "bracketSpacing": true,
     "jsxBracketSameLine": false,
     "semi": true,
-    "bracketSameLine": false
+    "bracketSameLine": false,
+    "htmlWhitespaceSensitivity": "strict",
+    "embeddedLanguageFormatting": "off"
 }
