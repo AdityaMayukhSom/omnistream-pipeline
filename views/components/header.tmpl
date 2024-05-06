@@ -1,0 +1,13 @@
+<header>
+    <nav>
+        <div id="left-contents">
+            <p>Welcome, {{ .name | Capitalize }}</p>
+        </div>
+        <div id="right-contents">
+            <a href="/write">Write</a>
+            <form action="/api/v1/auth/logout" method="post">
+                <input id="logout-button" type="submit" value="Logout" style="cursor: pointer;">
+            </form>
+        </div>
+    </nav>
+</header>
