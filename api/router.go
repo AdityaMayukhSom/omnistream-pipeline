@@ -6,6 +6,7 @@ import (
 
 	"devstream.in/pixelated-pipeline/api/controllers"
 	"devstream.in/pixelated-pipeline/api/middlewares"
+	"devstream.in/pixelated-pipeline/api/renderers"
 	"devstream.in/pixelated-pipeline/config"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -56,7 +57,7 @@ func (er *EchoRouter) RegisterRoutes() {
 }
 
 func (er *EchoRouter) registerWebRoutes() {
-	er.echo.Renderer = controllers.NewRenderer("./views/*", true)
+	er.echo.Renderer = renderers.NewRenderer("views", true)
 
 	// Group made out from the same path as the base echo router
 	fileRoutes := er.echo.Group("")
@@ -79,9 +80,14 @@ func (er *EchoRouter) registerWebRoutes() {
 	fileRoutes.GET("/login", controllers.DisplayLoginPage, middlewares.WithAlreadyAuthenticated)
 	fileRoutes.GET("/signup", controllers.DisplaySignupPage, middlewares.WithAlreadyAuthenticated)
 
+	// A route to forcefully logout from the browser
+	fileRoutes.GET("/expire", controllers.LogOut)
+
 	// Routes which internally renders the HTML from templates.
 	fileRoutes.GET("/helloworld", controllers.RenderHelloWorldPage, middlewares.WithAuthentication)
+
 	fileRoutes.GET("/home", controllers.RenderHomePage, middlewares.WithAuthentication)
+	fileRoutes.GET("/write", controllers.RenderWritePage, middlewares.WithAuthentication)
 
 }
 
@@ -96,6 +102,7 @@ func (er *EchoRouter) registerApiRoutes() {
 	authApiRoute.POST("/register", controllers.SignUp)
 	authApiRoute.POST("/login", controllers.LogIn)
 	authApiRoute.POST("/refresh", controllers.Refresh)
+	authApiRoute.GET("/logout", controllers.LogOut)
 	authApiRoute.POST("/logout", controllers.LogOut)
 
 	restrictedApiRoute := apiV1.Group("/")
