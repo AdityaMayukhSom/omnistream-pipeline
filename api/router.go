@@ -56,7 +56,12 @@ func (er *EchoRouter) RegisterRoutes() {
 	er.registerApiRoutes()
 }
 
+// web routes will serve the index files and required assets in case of a SPA,
+// hence to support web routes, it should point to the dist directory of the build
+// application and serve the files as a static web server.
 func (er *EchoRouter) registerWebRoutes() {
+	// used to render go templates, not used when SPA or any javascript
+	// based frontend client is used to deploy the website.
 	er.echo.Renderer = renderers.NewRenderer("views", true)
 
 	// Group made out from the same path as the base echo router
@@ -66,29 +71,22 @@ func (er *EchoRouter) registerWebRoutes() {
 	// The static directory is respect to the root directory of the application.
 	// The separate file systems are for fine grained control so that not any other
 	// file stored inside the static directory can be directly accessed.
-	tmplJsFS := os.DirFS("static/js")
-	tmplCssFS := os.DirFS("static/css")
-	tmplImgFS := os.DirFS("static/img")
+	distAssetsFS := os.DirFS("web/dist/assets")
+	distImagesFS := os.DirFS("web/dist/images")
 
 	// setting up to serve static files
-	fileRoutes.StaticFS("/js", tmplJsFS)
-	fileRoutes.StaticFS("/css", tmplCssFS)
-	fileRoutes.StaticFS("/img", tmplImgFS)
+	fileRoutes.StaticFS("/assets", distAssetsFS)
+	fileRoutes.StaticFS("/images", distImagesFS)
 
-	// Setting up the URLs to serve user facing UIs.
-	// Routes in which static HTML is served.
-	fileRoutes.GET("/login", controllers.DisplayLoginPage, middlewares.WithAlreadyAuthenticated)
-	fileRoutes.GET("/signup", controllers.DisplaySignupPage, middlewares.WithAlreadyAuthenticated)
-
-	// A route to forcefully logout from the browser
-	fileRoutes.GET("/expire", controllers.LogOut)
-
-	// Routes which internally renders the HTML from templates.
-	fileRoutes.GET("/helloworld", controllers.RenderHelloWorldPage, middlewares.WithAuthentication)
-
-	fileRoutes.GET("/home", controllers.RenderHomePage, middlewares.WithAuthentication)
-	fileRoutes.GET("/write", controllers.RenderWritePage, middlewares.WithAuthentication)
-
+	// Setting up the URLs to serve user facing UIs i.e. routes in which static HTML is served.
+	// Refer to https://sentry.io/answers/why-don-t-react-router-urls-work-when-refreshing-or-writing-manually/
+	// Path Matching Order https://echo.labstack.com/docs/routing#path-matching-order
+	// Match Any routes are mapped at the end, so will not be a problem for /api/ routes as they will be
+	// matched before, then anything fallback shows the index page. The handlerFunc is hardcoded here
+	// as only a single static file is served over all the routes, that is the entry point to the website.
+	fileRoutes.GET("/*", func(c echo.Context) error {
+		return c.File("web/dist/index.html")
+	})
 }
 
 // Registers routes concerned with the API endpoints.
@@ -98,19 +96,25 @@ func (er *EchoRouter) registerApiRoutes() {
 	apiV1.GET("/posts", controllers.ReturnAllPosts)
 	apiV1.GET("/posts/:username/:postname", controllers.ReturnSinglePost)
 
-	authApiRoute := apiV1.Group("/auth")
+	// logout routes do not need to check whether the user is authenticated or not
+	// it should simply destroy any authentication token present in the users browser
+	// and if session is ongoing, shall also terminate the session.
+	apiV1.POST("/logout", controllers.LogOut)
+
+	// A route to forcefully logout from the browser.
+	apiV1.GET("/logout", controllers.LogOut)
+
+	authApiRoute := apiV1.Group("/auth", middlewares.WithAlreadyAuthenticated)
 	authApiRoute.POST("/register", controllers.SignUp)
 	authApiRoute.POST("/login", controllers.LogIn)
 	authApiRoute.POST("/refresh", controllers.Refresh)
-	authApiRoute.GET("/logout", controllers.LogOut)
-	authApiRoute.POST("/logout", controllers.LogOut)
 
 	restrictedApiRoute := apiV1.Group("/")
 	restrictedApiRoute.Use(middlewares.WithAuthentication)
 
 	restrictedApiRoute.POST("/posts", controllers.CreatePost)
-	restrictedApiRoute.DELETE("/posts/{id}", controllers.DeletePost)
-	restrictedApiRoute.PUT("/posts/{id}", controllers.UpdatePost)
+	restrictedApiRoute.DELETE("/posts/:id", controllers.DeletePost)
+	restrictedApiRoute.PUT("/posts/:id", controllers.UpdatePost)
 }
 
 func (er *EchoRouter) Start() {
