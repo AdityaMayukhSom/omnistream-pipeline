@@ -6,7 +6,6 @@ import (
 
 	"devstream.in/pixelated-pipeline/api/controllers"
 	"devstream.in/pixelated-pipeline/api/middlewares"
-	"devstream.in/pixelated-pipeline/api/renderers"
 	"devstream.in/pixelated-pipeline/config"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -62,7 +61,7 @@ func (er *EchoRouter) RegisterRoutes() {
 func (er *EchoRouter) registerWebRoutes() {
 	// used to render go templates, not used when SPA or any javascript
 	// based frontend client is used to deploy the website.
-	er.echo.Renderer = renderers.NewRenderer("views", true)
+	er.echo.Renderer = NewRenderer("views", true)
 
 	// Group made out from the same path as the base echo router
 	fileRoutes := er.echo.Group("")

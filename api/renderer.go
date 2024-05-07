@@ -1,4 +1,4 @@
-package renderers
+package api
 
 import (
 	"html/template"
@@ -10,6 +10,11 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
+
+// Returns implementation of the echo renderer interface
+func NewRenderer(directory string, debug bool) echo.Renderer {
+	return NewUnrolledWrapperRenderer(directory, debug)
+}
 
 const (
 	layoutFileName = "layout"
