@@ -1,1 +1,0 @@
-console.log("hello from static files in pixelated-project")
