@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"os"
 
 	"devstream.in/pixelated-pipeline/api/controllers"
 	"devstream.in/pixelated-pipeline/api/middlewares"
@@ -61,21 +60,21 @@ func (er *EchoRouter) RegisterRoutes() {
 func (er *EchoRouter) registerWebRoutes() {
 	// used to render go templates, not used when SPA or any javascript
 	// based frontend client is used to deploy the website.
-	er.echo.Renderer = NewRenderer("views", true)
+	// er.echo.Renderer = NewRenderer("views", true)
 
 	// Group made out from the same path as the base echo router
-	fileRoutes := er.echo.Group("")
+	// fileRoutes := er.echo.Group("")
 
 	// For serving static resources such as images, javascript, css etc
 	// The static directory is respect to the root directory of the application.
 	// The separate file systems are for fine grained control so that not any other
 	// file stored inside the static directory can be directly accessed.
-	distAssetsFS := os.DirFS("web/dist/assets")
-	distImagesFS := os.DirFS("web/dist/images")
+	// distAssetsFS := os.DirFS("web/dist/assets")
+	// distImagesFS := os.DirFS("web/dist/images")
 
 	// setting up to serve static files
-	fileRoutes.StaticFS("/assets", distAssetsFS)
-	fileRoutes.StaticFS("/images", distImagesFS)
+	// fileRoutes.StaticFS("/assets", distAssetsFS)
+	// fileRoutes.StaticFS("/images", distImagesFS)
 
 	// Setting up the URLs to serve user facing UIs i.e. routes in which static HTML is served.
 	// Refer to https://sentry.io/answers/why-don-t-react-router-urls-work-when-refreshing-or-writing-manually/
@@ -83,9 +82,9 @@ func (er *EchoRouter) registerWebRoutes() {
 	// Match Any routes are mapped at the end, so will not be a problem for /api/ routes as they will be
 	// matched before, then anything fallback shows the index page. The handlerFunc is hardcoded here
 	// as only a single static file is served over all the routes, that is the entry point to the website.
-	fileRoutes.GET("/*", func(c echo.Context) error {
-		return c.File("web/dist/index.html")
-	})
+	// fileRoutes.GET("/*", func(c echo.Context) error {
+	// 	return c.File("web/dist/index.html")
+	// })
 }
 
 // Registers routes concerned with the API endpoints.
