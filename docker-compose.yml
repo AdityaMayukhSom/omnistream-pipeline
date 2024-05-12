@@ -36,7 +36,7 @@ services:
   pixelated_pen:
     build:
       context: ./web/
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.dev
     container_name: pixelated_pen
     restart: always
     networks:
