@@ -34,12 +34,22 @@ services:
       - '9000:8080'
 
   pixelated_pen:
-    # TODO: add hmr support https://stackoverflow.com/questions/71297042/react-hot-reload-doesnt-work-in-docker-container
-    build: ./web/
+    build:
+      context: ./web/
+      dockerfile: ./Dockerfile
     container_name: pixelated_pen
     restart: always
     networks:
       - proxy_network
+    # Don't know why but exposing this port makes HMR auto reload the output, making it like native HMR
+    # without this, though the rebuild happens, we need to manually reload the webpage in the browser.
+    # This can be removed in production as for production build, there is no HMR, but while developing
+    # locally, do not remove this port mapping.
+    ports:
+      - '3000:3000' # In production comment this
+    volumes:
+      - "./web/src:/app/src" # In production comment this 
+      - "./web/static:/app/static" # In production comment this
     depends_on:
       - pixelated_pipeline
 
@@ -50,9 +60,6 @@ services:
     ports:
       # port mappings do not work with host network driver
       - '8008:80'
-    extra_hosts:
-      # https://stackoverflow.com/questions/27810076/how-do-i-access-a-server-on-localhost-with-nginx-docker-container
-      - "dockerhost:192.168.0.115"
     networks:
       - proxy_network
     volumes:
