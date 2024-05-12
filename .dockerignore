@@ -1,0 +1,16 @@
+build
+nginx
+.vscode
+.idea
+README.md
+*.md
+lld.excalidraw.png
+application.schema.json
+.gitmodules
+.gitignore
+.git
+Makefile
+.prettierrc
+.prettierignore
+web
+build_cache
