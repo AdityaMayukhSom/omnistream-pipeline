@@ -2,8 +2,7 @@ build
 nginx
 .vscode
 .idea
-README.md
-*.md
+**/*.md
 lld.excalidraw.png
 application.schema.json
 .gitmodules
@@ -12,5 +11,4 @@ application.schema.json
 Makefile
 .prettierrc
 .prettierignore
-web
 build_cache
