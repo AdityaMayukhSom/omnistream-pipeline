@@ -1,17 +1,14 @@
-FLAGS =
+ENV_VARS = CGO_ENABLED=0 GOOS=linux
+FLAGS = -race
 PACKAGE_NAME = api
-INPUT_DIR = main.go
-OUTPUT_DIR = ./build/
+INPUT_FILE = main.go
+OUTPUT_FILE = ./tmp/main
 
 .PHONY: build
 build: 
-	go build $(FLAGS) -o $(OUTPUT_DIR) $(INPUT_DIR)
-
-.PHONY: clean
-clean:
-	rm -r $(OUTPUT_DIR)*
+	$(ENV_VARS) go build $(FLAGS) -o $(OUTPUT_FILE) $(INPUT_FILE)
 
 .PHONY: run
 run: build
-	./build/main.exe
+	$(OUTPUT_FILE)
 
