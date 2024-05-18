@@ -17,7 +17,7 @@ func SignUp(c echo.Context) (err error) {
 	err = c.Bind(&req)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ResponseError{
-			ErrorMessage: "could not parse request body",
+			Type: apiConstant.ERROR_TYPE_INVALID_BODY,
 		})
 	}
 
@@ -32,22 +32,21 @@ func SignUp(c echo.Context) (err error) {
 
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ResponseError{
-			ErrorMessage: err.Error(),
+			Message: err.Error(),
 		})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]any{
-		"message": "user successfully registered",
+	return c.JSON(http.StatusCreated, dto.ResponseRegisteredUser{
+		Type: apiConstant.RESPONSE_TYPE_SUCCESSFUL_REGISTERED,
 	})
 }
 
 func LogIn(c echo.Context) error {
 	var req dto.RequestLoginUser
 
-	err := c.Bind(&req)
-	if err != nil {
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, dto.ResponseError{
-			ErrorMessage: "could not parse request body",
+			Type: apiConstant.ERROR_TYPE_INVALID_BODY,
 		})
 	}
 
@@ -61,8 +60,16 @@ func LogIn(c echo.Context) error {
 	})
 
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, dto.ResponseError{
-			ErrorMessage: err.Error(),
+		return c.JSON(http.StatusUnauthorized, dto.ResponseError{
+			Type:    apiConstant.ERROR_TYPE_INVALID_LOGIN_CREDENTIALS,
+			Message: err.Error(),
+		})
+	}
+
+	user, err := userService.GetDetails(req.Username)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, dto.ResponseError{
+			Message: err.Error(),
 		})
 	}
 
@@ -71,9 +78,9 @@ func LogIn(c echo.Context) error {
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameAccessToken,
 		Value:    tokenStruct.AccessToken,
-		Path:     "/",
+		Path:     apiConstant.CookiePathAccessToken,
 		Expires:  time.Now().Add(time.Minute * 15),
-		// Secure: true, // when true browser only transmit the cookie over https channel
+		// Secure:   false, // when true browser only transmit the cookie over https channel
 	}
 
 	refreshCookie := &http.Cookie{
@@ -81,44 +88,51 @@ func LogIn(c echo.Context) error {
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameRefreshToken,
 		Value:    tokenStruct.RefreshToken,
-		Path:     "/api/v1/auth/", // matches api version 1, TODO : to match any api auth version
-		Expires:  time.Now().Add(time.Hour * 24 * 7),
-		// Secure: true, // when true browser only transmit the cookie over https channel
+		Path:     apiConstant.CookiePathRefreshToken, // matches api version 1, TODO : to match any api auth version
+		Expires:  time.Now().Add(time.Hour * 24),
+		// Secure:   false, // when true browser only transmit the cookie over https channel
 	}
 
 	c.SetCookie(accessCookie)
 	c.SetCookie(refreshCookie)
 
-	// actually not helpful in case of api responses
-	// TODO: redirect based on where the request is coming
-	// IDEA: we can set cookie if the request is coming from the web application
-	// otherwise we can simply return with a json data containing the signed tokens
-	return c.Redirect(http.StatusSeeOther, apiConstant.DefaultAuthenticatedRoute)
+	return c.JSON(http.StatusAccepted, dto.ResponseLoginUser{
+		Type: apiConstant.RESPOSNE_TYPE_NEWLY_AUTHENTICATED,
+		User: dto.UserDTO{
+			Name:     user.Name,
+			Username: user.Username,
+		},
+	})
 }
 
 func LogOut(c echo.Context) error {
 	accessCookie := &http.Cookie{
+		SameSite: http.SameSiteStrictMode,
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameAccessToken,
 		Value:    "",
 		MaxAge:   -1,
-		Path:     "/",
+		Path:     apiConstant.CookiePathAccessToken,
 		Expires:  time.Unix(0, 0),
 	}
 
 	refreshCookie := &http.Cookie{
+		SameSite: http.SameSiteStrictMode,
 		HttpOnly: true,
 		Name:     apiConstant.CookieNameRefreshToken,
 		Value:    "",
 		MaxAge:   -1,
-		Path:     "/api/v1/auth/",
+		Path:     apiConstant.CookiePathRefreshToken,
 		Expires:  time.Unix(0, 0),
 	}
 
 	c.SetCookie(accessCookie)
 	c.SetCookie(refreshCookie)
 
-	return c.Redirect(http.StatusSeeOther, apiConstant.DefaultUnauthenticatedRoute)
+	return c.JSON(http.StatusOK, dto.ResponseLogoutUser{
+		Type:       apiConstant.RESPONSE_TYPE_SUCCESSFUL_LOGOUT,
+		LogoutTime: time.Now(),
+	})
 }
 
 func Refresh(c echo.Context) error {
