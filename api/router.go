@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	"devstream.in/pixelated-pipeline/api/controllers"
 	"devstream.in/pixelated-pipeline/api/middlewares"
@@ -35,13 +36,20 @@ func NewEchoRouter() *EchoRouter {
 
 func (er *EchoRouter) RegisterRoutes() {
 	er.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
+		AllowOrigins: []string{},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
 			echo.HeaderContentType,
 			echo.HeaderAccept,
 			echo.HeaderContentLength,
+			echo.HeaderLocation,
+			echo.HeaderReferrerPolicy,
+			echo.HeaderAuthorization,
+			echo.HeaderXRealIP,
+			echo.HeaderCookie,
+			echo.HeaderAcceptEncoding,
 		},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 	}))
 
 	// To declare global router wise static directory.
@@ -85,6 +93,11 @@ func (er *EchoRouter) registerWebRoutes() {
 	// fileRoutes.GET("/*", func(c echo.Context) error {
 	// 	return c.File("web/dist/index.html")
 	// })
+
+	// route to check whether api backend working or not
+	er.echo.GET("/api/home", func(c echo.Context) error {
+		return c.String(http.StatusOK, "hello from modified air... v5")
+	})
 }
 
 // Registers routes concerned with the API endpoints.
