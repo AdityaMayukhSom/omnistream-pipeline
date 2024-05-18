@@ -19,6 +19,8 @@ type UserService interface {
 	// Registers the user into the database. If a user with same credentials
 	// already exists, returns a non null error value.
 	RegisterUser(user models.User) error
+
+	GetDetails(username string) (*models.User, error)
 }
 
 func NewUserService() UserService {
@@ -27,8 +29,7 @@ func NewUserService() UserService {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type UserServiceImpl struct {
-}
+type UserServiceImpl struct{}
 
 func NewUserServiceImpl() *UserServiceImpl {
 	return &UserServiceImpl{}
@@ -80,4 +81,10 @@ func (us *UserServiceImpl) RegisterUser(user models.User) (err error) {
 	user.Password = string(hashedPassword)
 	_, err = db.CreateUser(user)
 	return err
+}
+
+func (us *UserServiceImpl) GetDetails(username string) (*models.User, error) {
+	db := database.Init()
+	user, err := db.FindUserByUsername(username)
+	return &user, err
 }
