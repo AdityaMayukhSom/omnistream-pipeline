@@ -23,6 +23,8 @@ main
 
 # deployment specific descriptors
 application.yml
+#file to describe the home api endpoint
+!home.txt
 
 # code editor specific directories
 .idea
