@@ -6,9 +6,10 @@ type appConfig struct {
 	refreshSecretKey string
 	datasource       string
 	runMigration     bool
+	allowedOrigins   []string
 }
 
-func newAppConfig(port int, accessSecretKey string,
+func newAppConfig(port int, allowedOrigins []string, accessSecretKey string,
 	refreshSecretKey string, datasource string, runMigration bool) (appConfig, error) {
 
 	ac := appConfig{
@@ -17,6 +18,7 @@ func newAppConfig(port int, accessSecretKey string,
 		refreshSecretKey: refreshSecretKey,
 		datasource:       datasource,
 		runMigration:     runMigration,
+		allowedOrigins:   allowedOrigins,
 	}
 
 	return ac, nil
