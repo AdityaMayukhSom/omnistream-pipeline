@@ -1,8 +1,8 @@
-ENV_VARS = CGO_ENABLED=0 GOOS=linux
+ENV_VARS = CGO_ENABLED=1 GOOS=windows
 FLAGS = -race
 PACKAGE_NAME = api
 INPUT_FILE = main.go
-OUTPUT_FILE = ./tmp/main
+OUTPUT_FILE = ./tmp/main.exe
 
 .PHONY: build
 build: 
