@@ -22,6 +22,6 @@ func main() {
 	}
 
 	router := api.NewRouter()
-	router.RegisterRoutes()
+	router.RegisterRoutes(config.GetAllowedOrigins())
 	router.Start()
 }
