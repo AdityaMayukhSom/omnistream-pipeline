@@ -32,3 +32,6 @@ application.yml
 # docs can be generated using swaggo's echo-swagger 
 # using the commnd line tool `swag init`
 docs/
+
+# tmp directory is used to store the temporary files created
+tmp/
