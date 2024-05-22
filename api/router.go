@@ -13,7 +13,7 @@ import (
 )
 
 type Router interface {
-	RegisterRoutes()
+	RegisterRoutes(allowedOrigins []string)
 	Start()
 }
 
@@ -33,9 +33,9 @@ func NewEchoRouter() *EchoRouter {
 	}
 }
 
-func (er *EchoRouter) RegisterRoutes() {
+func (er *EchoRouter) RegisterRoutes(allowedOrigins []string) {
 	er.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{},
+		AllowOrigins: allowedOrigins,
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
 			echo.HeaderContentType,
