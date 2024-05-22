@@ -22,3 +22,5 @@ Frontend is written using Svelte Kit (Pixelated Pen).
     **TODO:** Work has been ongoing for creating a Dockerfile which can be used to run the project using a single command and will not require the use of `make`. That will lead to easier deployments.
 
 4. For the developers of the software, if provided, read the `doc.go` under whichever package you are using to understand potential implementation details and pitfalls to look for.
+
+5. For the ease of development, make sure you have `gcc` installed, otherwise you need to remove the `-race` flag from go compiler options and make `CGO_ENABLED=0` as to check race condition, `cgo` is required.
