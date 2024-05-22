@@ -18,6 +18,7 @@ func LoadApplicationConfig() error {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("app.port", 8080)
+	viper.SetDefault("app.allowed_origins", []string{})
 	viper.SetDefault("database.migrate", false)
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -49,6 +50,7 @@ func LoadApplicationConfig() error {
 
 	globalConfig, err = newAppConfig(
 		viper.GetInt("app.port"),
+		viper.GetStringSlice("app.allowed_origins"),
 		viper.GetString("app.access_secret_key"),
 		viper.GetString("app.refresh_secret_key"),
 		datasource,
@@ -69,3 +71,4 @@ func GetAccessSecretKey() string  { return globalConfig.accessSecretKey }
 func GetRefreshSecretKey() string { return globalConfig.refreshSecretKey }
 func GetDataSourceUri() string    { return globalConfig.datasource }
 func ShallRunMigration() bool     { return globalConfig.runMigration }
+func GetAllowedOrigins() []string { return globalConfig.allowedOrigins }
