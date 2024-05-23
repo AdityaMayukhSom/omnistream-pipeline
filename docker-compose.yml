@@ -26,7 +26,7 @@ services:
   pixelated_pipeline:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: dev.Dockerfile
     container_name: pixelated_pipeline
     restart: always
     networks:
