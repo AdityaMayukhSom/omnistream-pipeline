@@ -3,8 +3,9 @@ package dto
 import "time"
 
 type ResponseLoginUser struct {
-	Type string  `json:"type"`
-	User UserDTO `json:"user"`
+	Type          string  `json:"type"`
+	Authenticated bool    `json:"authenticated"`
+	User          UserDTO `json:"user"`
 }
 
 type ResponseLogoutUser struct {

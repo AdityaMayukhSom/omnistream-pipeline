@@ -211,3 +211,19 @@ func Refresh(c echo.Context) error {
 	// json.NewEncoder(w).Encode(responseJSON)
 	return nil
 }
+
+func IsAuthenticated(c echo.Context) error {
+	// if the request reaches here, after passing the middleware filter
+	// means the user is not authenticated in that case as we ain't asking
+	// for any data, we can simply return authentication as false.
+	// note we are returning status accepted as this is a valid response
+	// that the user is not authenticated
+	return c.JSON(http.StatusAccepted, dto.ResponseLoginUser{
+		Type:          apiConstant.RESPONSE_TYPE_NOT_AUTHENTICATED,
+		Authenticated: false,
+		User: dto.UserDTO{
+			Name:     "",
+			Username: "",
+		},
+	})
+}

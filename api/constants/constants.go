@@ -25,6 +25,7 @@ const (
 	RESPOSNE_TYPE_NEWLY_AUTHENTICATED   string = "newly_authenticated"
 	RESPONSE_TYPE_SUCCESSFUL_LOGOUT     string = "logged_out_successfully"
 	RESPONSE_TYPE_SUCCESSFUL_REGISTERED string = "user_successfully_registered"
+	RESPONSE_TYPE_NOT_AUTHENTICATED     string = "user_not_authenticated"
 )
 
 const (

@@ -118,6 +118,7 @@ func (er *EchoRouter) registerApiRoutes() {
 	authApiRoute.POST("/register", controllers.SignUp)
 	authApiRoute.POST("/login", controllers.LogIn)
 	authApiRoute.POST("/refresh", controllers.Refresh)
+	authApiRoute.GET("/is-authenticated", controllers.IsAuthenticated)
 
 	restrictedApiRoute := apiV1.Group("/")
 	restrictedApiRoute.Use(middlewares.WithAuthentication)

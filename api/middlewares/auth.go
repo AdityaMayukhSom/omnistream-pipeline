@@ -41,7 +41,8 @@ func WithAlreadyAuthenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			tokenService := services.NewTokenService()
 			if username, name, err := tokenService.ValidateToken(tokenCookie.Value, config.GetAccessSecretKey()); err == nil {
 				return c.JSON(http.StatusOK, dto.ResponseLoginUser{
-					Type: apiConstant.RESPONSE_TYPE_ALREADY_AUTHENTICATED,
+					Type:          apiConstant.RESPONSE_TYPE_ALREADY_AUTHENTICATED,
+					Authenticated: true,
 					User: dto.UserDTO{
 						Name:     name,
 						Username: username,
