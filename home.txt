@@ -2,5 +2,3 @@
 
 This is V1 of Pixelated Parchment API.
 Breathe some fresh Air. Have a nice day!
-
-Maintained by Aditya.
