@@ -123,6 +123,7 @@ func (er *EchoRouter) registerApiRoutes() {
 	restrictedApiRoute := apiV1.Group("/")
 	restrictedApiRoute.Use(middlewares.WithAuthentication)
 
+	restrictedApiRoute.GET("/users/:username", controllers.ReturnUserData)
 	restrictedApiRoute.POST("/posts", controllers.CreatePost)
 	restrictedApiRoute.DELETE("/posts/:id", controllers.DeletePost)
 	restrictedApiRoute.PUT("/posts/:id", controllers.UpdatePost)
