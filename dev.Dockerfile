@@ -1,5 +1,6 @@
 FROM golang:1.22.3-alpine3.19
 WORKDIR /app
+# cosmtrek air is a command line utility for live reload in development stage.
 RUN go install github.com/cosmtrek/air@latest
 COPY go.mod go.sum ./
 RUN go mod download
