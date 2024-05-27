@@ -31,7 +31,7 @@ WORKDIR /
 COPY --from=build-stage /etc/passwd /etc/passwd
 
 # current user does not need to be root as database is shifted to cloud
-USER ${USER_NAME}
+# USER ${USER_NAME} # this non root user cannot access /etc/secrets, need to use groups to give access
 
 # copies the pixelated-pipeline from the previous build stage to this one.
 COPY --from=build-stage /app/pixelated-pipeline /pixelated-pipeline
