@@ -19,6 +19,7 @@ WORKDIR /
 COPY application.yml /etc/secrets/application.yml
 # copies the pixelated-pipeline from the previous build stage to this one.
 COPY --from=build-stage /pixelated-pipeline /pixelated-pipeline
+EXPOSE 8080
 # USER nonroot:nonroot
 # finally starts the backend.
 ENTRYPOINT [ "/pixelated-pipeline" ]

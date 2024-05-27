@@ -1,49 +1,11 @@
 services:
-  postgresql_database:
-    image: postgres:16.2-alpine3.19
-    container_name: postgresql_database
-    restart: always
-    environment:
-      POSTGRES_DB: pixelated-project
-      POSTGRES_PASSWORD: change-me-in-prod
-      POSTGRES_USER: developer
-    networks:
-      - database_network
-    volumes:
-      - postgres_volume:/var/lib/postgresql/data
-
-  adminer:
-    image: adminer
-    container_name: adminer_database_ui
-    restart: always
-    networks:
-      - database_network
-    depends_on:
-      - postgresql_database
-    ports:
-      - "9000:8080"
-
   pixelated_pipeline:
     build:
       context: .
       dockerfile: dev.Dockerfile
     container_name: pixelated_pipeline
     restart: always
-    networks:
-      - database_network
-    depends_on:
-      - postgresql_database
     volumes:
       - "./:/app" # In production comment this
     ports:
       - "8080:8080"
-    
-
-volumes:
-  postgres_volume:
-    name: pixelated-project-data
-    driver: local
-
-networks:
-  database_network:
-    driver: bridge
