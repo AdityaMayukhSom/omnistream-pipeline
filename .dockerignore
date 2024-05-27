@@ -12,3 +12,5 @@ Makefile
 .prettierrc
 .prettierignore
 build_cache
+./tmp/*
+*.exe
