@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	"devstream.in/pixelated-pipeline/api/controllers"
 	"devstream.in/pixelated-pipeline/api/middlewares"
@@ -95,7 +96,11 @@ func (er *EchoRouter) registerWebRoutes() {
 
 	// route to check whether api backend working or not
 	er.echo.GET("/api/home", func(c echo.Context) error {
-		return c.File("home.txt")
+		return c.File("public/home.txt")
+	})
+
+	er.echo.GET("/api/helloworld", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello World from Pixelated Pipeline...")
 	})
 }
 
