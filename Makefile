@@ -1,5 +1,5 @@
-ENV_VARS = CGO_ENABLED=1 GOOS=windows
-FLAGS = -race -ldflags "-w -s"
+ENV_VARS = CGO_ENABLED=0 GOOS=windows
+FLAGS = -ldflags "-w -s"
 PACKAGE_NAME = api
 INPUT_FILE = main.go
 OUTPUT_FILE = ./tmp/main.exe
