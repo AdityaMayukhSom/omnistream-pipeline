@@ -6,6 +6,28 @@ services:
     container_name: pixelated_pipeline
     restart: always
     volumes:
-      - "./application.yml:/etc/secrets/application.yml" # Maybe comment this on production too
+      - "./application.yml:/etc/secrets/application.yml"
     ports:
       - "8080:8080"
+
+  postgresql_database:
+    image: postgres:16.2-alpine3.19
+    container_name: postgresql_database
+    restart: always
+    environment:
+      POSTGRES_DB: pixelated-project
+      POSTGRES_PASSWORD: change-me-in-prod
+      POSTGRES_USER: developer
+    networks:
+      - database_network
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+volumes:
+  postgres_volume:
+    name: pixelated-project-data
+    driver: local
+
+networks:
+  database_network:
+    driver: bridge
