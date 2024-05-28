@@ -22,7 +22,8 @@ vendor/
 main
 
 # deployment specific descriptors
-application.yml
+application.*yml
+
 #file to describe the home api endpoint
 !home.txt
 
