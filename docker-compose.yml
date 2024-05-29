@@ -6,7 +6,7 @@ services:
     container_name: pixelated_pipeline
     restart: always
     volumes:
-      - "./application.yml:/etc/secrets/application.yml"
+      - "./application.dev.yml:/etc/secrets/application.yml"
     ports:
       - "8080:8080"
 
