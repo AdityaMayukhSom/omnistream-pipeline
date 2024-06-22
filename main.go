@@ -6,9 +6,19 @@ import (
 	"devstream.in/pixelated-pipeline/database"
 	"github.com/charmbracelet/log"
 
-	_ "github.com/swaggo/echo-swagger/example/docs"
+	_ "devstream.in/pixelated-pipeline/docs"
 )
 
+//	@title			Pixelated Pipeline API
+//	@version		1.0
+//	@description	This is a sample server Petstore server hello world.
+//	@contact.name	API Support
+//	@contact.url	http://www.swagger.io/support
+//	@contact.email	support@swagger.io
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+//	@BasePath	/api/v1
 func main() {
 	err := config.LoadApplicationConfig()
 	if err != nil {

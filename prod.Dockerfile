@@ -8,6 +8,7 @@ ARG USER_NAME
 ARG USER_UID
 
 RUN adduser -u ${USER_UID} --disabled-password --no-create-home ${USER_NAME}
+RUN go install github.com/swaggo/swag/cmd/swag@latest
 # creates a directory inside root called app and cd into that directory.
 WORKDIR /app
 # copies the go.mod and go.sum from our application into that directory.
@@ -16,6 +17,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 # copies everything else(the source code) except files mentioned in .dockerignore.
 COPY . .
+# generates swagger documentation
+RUN swag init
 # compiles the code and  creates an executable file named pixelated-pipeline.
 # the exe file produced is a standalone execuatable file.
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-w -s" -o ./pixelated-pipeline
