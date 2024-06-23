@@ -2,7 +2,7 @@ services:
   pixelated_pipeline:
     build:
       context: .
-      dockerfile: prod.Dockerfile
+      dockerfile: dev.Dockerfile
     container_name: pixelated_pipeline
     restart: always
     volumes:
